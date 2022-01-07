@@ -15,8 +15,8 @@ public class tester {
 
         //stmt.executeUpdate("INSERT INTO `dane osobowe`(adres_id, Imie,Nazwisko,nr_telefonu,mail) VALUES (1, 'Adam', 'Nowak' ,1243 ,'adaaa@bat.pl')");
 
-        int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);
-        System.out.println(register);
+        //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);
+       // System.out.println(register);
 
         String salt = DataSecurity.getSalt();
         String hashedPass = DataSecurity.getHashSHA512("Password", salt);
@@ -25,13 +25,20 @@ public class tester {
         System.out.println(" hash -> " + hashedPass);
 
 
-       // System.out.println(Request.login(con,"Passwor"));
+        System.out.println(Request.login(con,"Adamnowak","A!23456789"));
+        System.out.println(Request.login(con,"Adamnowak","A!23456788"));
+        System.out.println(Request.login(con,"Adaadfa11mNdswa","A!23456789"));
+        System.out.println(Request.login(con,"Adamnowk","A!23456789"));
+
+        /*
         System.out.println(DataSecurity.checkPasswords("password",salt.toString(),hashedPass));
         System.out.println(DataSecurity.checkPasswords("Password",salt.toString(),hashedPass));
         System.out.println(DataSecurity.checkPasswords("Password",salt.toString(),hashedPass));
         System.out.println(DataSecurity.checkPasswords("blababla",salt.toString(),hashedPass));
         System.out.println(DataSecurity.checkPasswords("Password",salt.toString(),hashedPass));
 
+
+         */
 
     }
 

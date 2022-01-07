@@ -5,6 +5,7 @@ public class Request {
     private static final String INSERT_DANE_OSOBOWE = "INSERT INTO dane_osobowe(adres_id, Imie,Nazwisko,nr_telefonu,mail) VALUES (?,?,?,?,?)";
     private static final String INSERT_KLIENT = "INSERT INTO klient(koszyk_ID, `dane_osobowe_ID`, login, haslo) VALUES (?,?,?,?)";
     private static final String INSERT_ADRES = "INSERT INTO adres(kod_pocztowy, ulica, numer) VALUES (?,?,?)";
+    private static final String SELECT_LOGIN = "SELECT login, haslo FROM klient WHERE login = ?";
 
     public static void parseRequest(String request, Connection con){
         if(request == "")return;
@@ -80,24 +81,27 @@ public class Request {
      * @param con connection
      * @param nickname of the user trying to login
      * @param password to check
-     * @return 0 - password correct, -1 - password incorrect, -2 nickname contain illegal symbols
+     * @return 0 - password correct, -1 - password incorrect, -2 nickname dont exists
      *
      */
     public static int login(Connection con, String nickname, String password){
-        String hash = null;
         String salt = null;
+        String haslo = null;
         if(DataSecurity.containIllegalSymbols(nickname)) return -2;
         try {
             Statement stmt=con.createStatement();
-            ResultSet rs=stmt.executeQuery("SELECT haslo FROM klient WHERE login ='"+ nickname+"';");
-            hash = rs.getString("haslo").split(":")[0];
-            System.out.println(hash);
-            salt = rs.getString("haslo").split(":")[1];
-            System.out.println(salt);
+            PreparedStatement ps = con.prepareStatement(SELECT_LOGIN);
+            ps.setString(1, nickname);
+            ResultSet rs= ps.executeQuery();
+            if (rs.next() == false) {
+                return -2;
+            }
+            haslo = rs.getString("haslo");
+            salt = haslo.split(":")[1];
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if(DataSecurity.checkPasswords(password,salt, hash)) return 0;
+        if(DataSecurity.checkPasswords(password,salt, haslo)) return 0;
         return -1;
     }
 
@@ -107,8 +111,8 @@ public class Request {
         if(DataSecurity.containIllegalSymbols(haslo)) return -4;
 
         try {
-            final String SELECT_LOGIN = "SELECT login FROM klient WHERE login = ?";
-            Statement stmt=con.createStatement();
+
+            Statement stmt;
             PreparedStatement ps = con.prepareStatement(SELECT_LOGIN);
             ps.setString(1, logi);
             //executeQuery("SELECT login FROM klient WHERE login = 'logi'");
