@@ -29,7 +29,7 @@ CREATE TABLE `adres` (
   `numer` int NOT NULL,
   PRIMARY KEY (`adres_ID`),
   UNIQUE KEY `adres_ID_UNIQUE` (`adres_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,18 +38,18 @@ CREATE TABLE `adres` (
 
 LOCK TABLES `adres` WRITE;
 /*!40000 ALTER TABLE `adres` DISABLE KEYS */;
-INSERT INTO `adres` VALUES (1,50120,'Szkolna',12),(2,50120,'Szkolna',12),(3,50120,'Szkolna',12),(4,50120,'Szkolna',12),(5,50120,'Szkolna',12),(6,50120,'Szkolna',12),(7,50120,'Szkolna',12),(8,50120,'Szkolna',12),(9,50120,'Szkolna',12);
+INSERT INTO `adres` VALUES (1,50120,'Szkolna',12),(2,50120,'Szkolna',12),(3,50120,'Szkolna',12),(4,50120,'Szkolna',12),(5,50120,'Szkolna',12),(6,50120,'Szkolna',12),(7,50120,'Szkolna',12),(8,50120,'Szkolna',12),(9,50120,'Szkolna',12),(10,50120,'Szkolna',12),(11,50120,'Szkolna',12),(12,50120,'Szkolna',12),(13,50120,'Szkolna',12),(14,50120,'Szkolna',12),(15,50120,'Szkolna',12),(16,50120,'Szkolna',12),(17,50120,'Szkolna',12),(18,50120,'Szkolna',12),(19,50120,'Szkolna',12),(20,50120,'Szkolna',12),(21,50120,'Szkolna',12),(22,50120,'Szkolna',12),(23,50120,'Szkolna',12),(24,50120,'Szkolna',12),(25,50120,'Szkolna',12),(26,50120,'Szkolna',12),(27,50120,'Szkolna',12),(28,50120,'Szkolna',12),(29,50120,'Szkolna',12),(30,50120,'Szkolna',12),(31,50120,'Szkolna',12),(32,50120,'Zielna',14),(33,50120,'Zielna',14),(34,50120,'Zielna',15),(35,50120,'Zielna',15),(36,50120,'Zielna',16),(37,50120,'Zielna',16),(38,50120,'Zielna',17),(39,50120,'Zielna',17),(40,50110,'Zielna',17),(41,50110,'Zielna',17),(42,10120,'Kasztanowa',11);
 /*!40000 ALTER TABLE `adres` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `dane osobowe`
+-- Table structure for table `dane_osobowe`
 --
 
-DROP TABLE IF EXISTS `dane osobowe`;
+DROP TABLE IF EXISTS `dane_osobowe`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `dane osobowe` (
+CREATE TABLE `dane_osobowe` (
   `dane_osobowe_ID` int NOT NULL AUTO_INCREMENT,
   `Imie` varchar(30) NOT NULL,
   `Nazwisko` varchar(30) NOT NULL,
@@ -62,16 +62,17 @@ CREATE TABLE `dane osobowe` (
   UNIQUE KEY `dane_osobowe_ID_UNIQUE` (`dane_osobowe_ID`),
   KEY `FKDane osobo145922` (`adres_id`),
   CONSTRAINT `FKDane osobo145922` FOREIGN KEY (`adres_id`) REFERENCES `adres` (`adres_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `dane osobowe`
+-- Dumping data for table `dane_osobowe`
 --
 
-LOCK TABLES `dane osobowe` WRITE;
-/*!40000 ALTER TABLE `dane osobowe` DISABLE KEYS */;
-/*!40000 ALTER TABLE `dane osobowe` ENABLE KEYS */;
+LOCK TABLES `dane_osobowe` WRITE;
+/*!40000 ALTER TABLE `dane_osobowe` DISABLE KEYS */;
+INSERT INTO `dane_osobowe` VALUES (1,'Adam','Nowak',123,'ada@bat.pl',1),(4,'Adam','Nowak',124,'adaa@bat.pl',1),(6,'Adam','Nowak',1243,'adaaa@bat.pl',1),(7,'Adam','Nowak',997,'adam@gmail.com',29),(9,'Adam','Nowak',998,'adama@gmail.com',31),(11,'Adam','Nowak',991,'adam1a@gmail.com',33),(12,'Adam','Nowak',9921,'adam1xa@gmail.com',34),(13,'Adam','Nowak',992221,'adam1xaa@gmail.com',35),(14,'Adam','Nowak',92221,'adam1xaa@gail.com',36),(15,'Adam','Nowak',922121,'adam1xasa@gail.com',37),(16,'Adam','Nowak',9228121,'adam1xas4a@gail.com',38),(17,'Adam','Nowak',92286121,'am1xas4a@gail.com',39),(19,'Adam','Nowak',922861821,'am1hxas4a@gail.com',41),(20,'Adam','Nowak',321,'abat@gail.com',42);
+/*!40000 ALTER TABLE `dane_osobowe` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -110,14 +111,14 @@ CREATE TABLE `klient` (
   `koszyk_ID` int NOT NULL,
   `dane_osobowe_ID` int NOT NULL,
   `login` varchar(20) NOT NULL,
-  `haslo` varchar(168) NOT NULL,
+  `haslo` varchar(180) NOT NULL,
   PRIMARY KEY (`klient_ID`),
   UNIQUE KEY `Login` (`login`),
   KEY `FKKlient89231` (`koszyk_ID`),
   KEY `FKKlient120104` (`dane_osobowe_ID`),
-  CONSTRAINT `FKKlient120104` FOREIGN KEY (`dane_osobowe_ID`) REFERENCES `dane osobowe` (`dane_osobowe_ID`),
+  CONSTRAINT `FKKlient120104` FOREIGN KEY (`dane_osobowe_ID`) REFERENCES `dane_osobowe` (`dane_osobowe_ID`),
   CONSTRAINT `FKKlient89231` FOREIGN KEY (`koszyk_ID`) REFERENCES `koszyk` (`koszyk_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -126,6 +127,7 @@ CREATE TABLE `klient` (
 
 LOCK TABLES `klient` WRITE;
 /*!40000 ALTER TABLE `klient` DISABLE KEYS */;
+INSERT INTO `klient` VALUES (1,4,19,'Adaadfa11mNdswa','0b0f750d7cd94fcbf14619c02ca917f1e392ec36231862afc27baacf6b9dd52f9eb8a3166b97854fb4c0dacae19e9d8cc7b3372940a15901bcd163ae1f9609ce:10dd3207217d23af70e144a2c5e40c175245c525a7a3fb70522'),(2,5,20,'Adamnowak','0a68c74d564ed883804c9391e0bb05e9023f28cd83379c5104231565f9b30156f59cc3f6dc783ac7028c250f8739749eee81768e7274e2d059ebace67218f332:535f758b7157701dc7468a30e40ef765019a7b9055700');
 /*!40000 ALTER TABLE `klient` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -141,7 +143,7 @@ CREATE TABLE `koszyk` (
   `produkt_list` int DEFAULT NULL,
   `wartosc_koszyka` float DEFAULT NULL,
   PRIMARY KEY (`koszyk_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -150,7 +152,7 @@ CREATE TABLE `koszyk` (
 
 LOCK TABLES `koszyk` WRITE;
 /*!40000 ALTER TABLE `koszyk` DISABLE KEYS */;
-INSERT INTO `koszyk` VALUES (1,NULL,NULL);
+INSERT INTO `koszyk` VALUES (1,NULL,NULL),(2,NULL,NULL),(3,NULL,NULL),(4,NULL,NULL),(5,NULL,NULL);
 /*!40000 ALTER TABLE `koszyk` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -282,7 +284,7 @@ CREATE TABLE `pracownik` (
   UNIQUE KEY `Funkcja` (`funkcja`),
   KEY `FKPracownik866164` (`placowka_id`),
   KEY `FKPracownik784739` (`dane_osobowe_ID`),
-  CONSTRAINT `FKPracownik784739` FOREIGN KEY (`dane_osobowe_ID`) REFERENCES `dane osobowe` (`dane_osobowe_ID`),
+  CONSTRAINT `FKPracownik784739` FOREIGN KEY (`dane_osobowe_ID`) REFERENCES `dane_osobowe` (`dane_osobowe_ID`),
   CONSTRAINT `FKPracownik866164` FOREIGN KEY (`placowka_id`) REFERENCES `placowka` (`placowka_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -364,4 +366,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-01-07 17:13:42
+-- Dump completed on 2022-01-07 18:41:51

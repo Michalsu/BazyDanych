@@ -108,31 +108,7 @@ public class DataSecurity {
         return safeString;
     }
 
-    /**
-     *
-     * @param con connection
-     * @param nickname of the user trying to login
-     * @param password to check
-     * @return 0 - password correct, -1 - password incorrect, -2 nickname contain illegal symbols
-     *
-     */
-    public static int login(Connection con, String nickname, String password){
-        String hash = null;
-        String salt = null;
-        if(containIllegalSymbols(nickname)) return -2;
-        try {
-            Statement stmt=con.createStatement();
-            ResultSet rs=stmt.executeQuery("SELECT haslo FROM klient WHERE login ='"+ nickname+"';");
-            hash = rs.getString("haslo").split(":")[0];
-            System.out.println(hash);
-            salt = rs.getString("haslo").split(":")[1];
-            System.out.println(salt);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        if(checkPasswords(password,salt, hash)) return 0;
-        return -1;
-    }
+
 
 
 
