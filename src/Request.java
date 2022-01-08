@@ -74,23 +74,46 @@ public class Request {
                 //
                 break;
             case "ADDPRODUCT":
-                //TODO
-                //
-                //
-                //
-                //
+                 sb = new StringBuilder();
+                sb.append("INSERT INTO produkt(produkt_id, cena, promocja, nazwa, opis, kategoria_id) VALUES");
+                sb.append("(' " + substrings[1] + "',");
+                sb.append("' " + substrings[2] + "',");
+                sb.append("' " + substrings[3] + "',");
+                sb.append("' " + substrings[4] + "',");
+                sb.append("' " + substrings[5] + "',");
+                sb.append("' " + substrings[6] + "');");
+                System.out.println(sb);
+                 query=sb.toString();
+                try {
+                    Statement stmt=con.createStatement();
+                    int rs=stmt.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 break;
             case "CHANGEPRODUCT":
-                //TODO
-                //
-                //
-                //
-                //
+                sb = new StringBuilder();
+                sb.append("UPDATE produkt SET ");
+                sb.append("cena = ' " + substrings[2]+ "', ");
+                sb.append("Promocja = ' " + substrings[3]+ "', ");
+                sb.append("nazwa = ' " + substrings[4]+ "', ");
+                sb.append("opis = ' " + substrings[5]+ "', ");
+                sb.append("cena = ' " + substrings[6]+ "' ");
+                sb.append("WHERE produkt_id = " + substrings[1]+ ";");
+                System.out.println(sb);
+                query=sb.toString();
+                try {
+                    Statement stmt=con.createStatement();
+                    int rs=stmt.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 break;
+        }
         }
     }
 
     private static int addToCart(int productID, int amount){
+
 
         return -1;
     }

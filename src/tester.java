@@ -17,7 +17,9 @@ public class tester {
 
         //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);
        // System.out.println(register);
+        Request.parseRequest("CHANGEPRODUCT#2#321#1#pies#pies#1#", con);
 
+/*
         String salt = DataSecurity.getSalt();
         String hashedPass = DataSecurity.getHashSHA512("Password", salt);
 
@@ -30,7 +32,8 @@ public class tester {
         System.out.println(Request.login(con,"Adaadfa11mNdswa","A!23456789"));
         System.out.println(Request.login(con,"Adamnowk","A!23456789"));
 
-        /*
+
+
         System.out.println(DataSecurity.checkPasswords("password",salt.toString(),hashedPass));
         System.out.println(DataSecurity.checkPasswords("Password",salt.toString(),hashedPass));
         System.out.println(DataSecurity.checkPasswords("Password",salt.toString(),hashedPass));
