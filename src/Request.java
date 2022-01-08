@@ -17,7 +17,7 @@ public class Request {
                 break;
             case "SEARCH":
                 StringBuilder sb = new StringBuilder();
-                sb.append("SELECT * FROM products WHERE name LIKE '%");
+                sb.append("SELECT * FROM produkt WHERE nazwa LIKE '%");
                 for(int i=1;i<parimeters-1;i++){
                     sb.append(substrings[i]);
                     sb.append("%' OR '%");
@@ -32,28 +32,60 @@ public class Request {
                 }
                 break;
             case "ADDTOCART":
-
+                //TODO
+                //
+                //
+                //
+                //
                 break;
             case "DELETEFROMCART":
-
+                //TODO
+                //
+                //
+                //
+                //
                 break;
             case "BUY":
-
+                //TODO
+                //
+                //
+                //
+                //
                 break;
             case "LOGOUT":
-
+                //TODO
+                //
+                //
+                //
+                //
                 break;
             case "COMPARE":
-
+                //TODO
+                //
+                //
+                //
+                //
                 break;
             case "REGISTER":
-
+                //TODO
+                //
+                //
+                //
+                //
                 break;
             case "ADDPRODUCT":
-
+                //TODO
+                //
+                //
+                //
+                //
                 break;
             case "CHANGEPRODUCT":
-
+                //TODO
+                //
+                //
+                //
+                //
                 break;
         }
     }
