@@ -17,7 +17,7 @@ public class tester {
 
         //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);
        // System.out.println(register);
-        Request.parseRequest("CHANGEPRODUCT#2#321#1#pies#pies#1#", con);
+        Request.parseRequest("COMPARE#1#2", con);
 
 /*
         String salt = DataSecurity.getSalt();

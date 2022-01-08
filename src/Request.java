@@ -60,11 +60,29 @@ public class Request {
                 //
                 break;
             case "COMPARE":
-                //TODO
-                //
-                //
-                //
-                //
+                StringBuilder sb2 = new StringBuilder();
+                sb = new StringBuilder();
+                sb.append("SELECT cena FROM produkt WHERE produkt_id = " + substrings[1] + " ;");
+                sb2.append("SELECT cena FROM produkt WHERE produkt_id = " + substrings[2] + " ;");
+                query=sb.toString();
+                System.out.println(sb);
+                String query2 = sb2.toString();
+                int price1=0;
+                int price2=0;
+
+                try {
+                    Statement stmt=con.createStatement();
+                    ResultSet rs = stmt.executeQuery(query);
+                    rs.next();
+                    price1 = rs.getInt(1);
+                     stmt=con.createStatement();
+                    ResultSet rs2 = stmt.executeQuery(query2);
+                    rs2.next();
+                    price2 = rs2.getInt(1);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 break;
             case "REGISTER":
                 //TODO
@@ -82,7 +100,6 @@ public class Request {
                 sb.append("' " + substrings[4] + "',");
                 sb.append("' " + substrings[5] + "',");
                 sb.append("' " + substrings[6] + "');");
-                System.out.println(sb);
                  query=sb.toString();
                 try {
                     Statement stmt=con.createStatement();
@@ -100,7 +117,6 @@ public class Request {
                 sb.append("opis = ' " + substrings[5]+ "', ");
                 sb.append("cena = ' " + substrings[6]+ "' ");
                 sb.append("WHERE produkt_id = " + substrings[1]+ ";");
-                System.out.println(sb);
                 query=sb.toString();
                 try {
                     Statement stmt=con.createStatement();
