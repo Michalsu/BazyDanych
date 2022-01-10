@@ -32,11 +32,88 @@ public class Request {
                 }
                 break;
             case "ADDTOCART":
-                //TODO
-                //
-                //
-                //
-                //
+                 sb = new StringBuilder();
+                sb.append("SELECT koszyk_id FROM klient WHERE login LIKE '%" + substrings[1] +"%'");
+                 query=sb.toString();
+
+                 int koszyk_id = 0;
+                try {
+
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery(query);
+                    rs.next();
+                    koszyk_id = rs.getInt(1);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                sb.setLength(0);
+                sb.append("UPDATE koszyk \n" +
+                                "SET produkt_list = CASE WHEN CAST(produkt_list AS CHAR) = '[]'  \n" +
+                                "                 THEN JSON_SET('{}', '$.produkty'," +substrings[2]+" )\n" +
+                                "                 ELSE JSON_ARRAY_APPEND(produkt_list, '$.produkty'," +substrings[2]+" ) \n" +
+                                "              END\n" +
+                                "where koszyk_ID = " + koszyk_id );
+                query=sb.toString();
+                try {
+                    Statement stmt=con.createStatement();
+                    int rs=stmt.executeUpdate(query);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                sb.setLength(0);
+                sb.append("INSERT INTO koszyk_produkt VALUES( '" + koszyk_id +"' , '" + substrings[2] + "' , '"+ substrings[3]+ "' )"  );
+                query=sb.toString();
+
+                try {
+                    Statement stmt=con.createStatement();
+                    int rs=stmt.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                sb.setLength(0);
+                sb.append("SELECT cena FROM produkt WHERE produkt_id = " +substrings[2] );
+                query=sb.toString();
+
+                float cena = 0;
+                try {
+
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery(query);
+                    rs.next();
+                    cena = rs.getFloat(1);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+
+                float wartosc_koszyka =0;
+
+                sb.setLength(0);
+                sb.append("SELECT wartosc_koszyka FROM koszyk WHERE koszyk_ID = " + koszyk_id );
+                query=sb.toString();
+
+                try {
+
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery(query);
+                    rs.next();
+                    wartosc_koszyka = rs.getFloat(1);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                    wartosc_koszyka = wartosc_koszyka +  cena * Float.parseFloat(substrings[3]);
+                sb.setLength(0);
+                sb.append("UPDATE koszyk SET wartosc_koszyka = "+ wartosc_koszyka +  "WHERE (koszyk_ID =" + koszyk_id + " )");
+                query=sb.toString();
+                try {
+                    Statement stmt=con.createStatement();
+                    int rs=stmt.executeUpdate(query);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 break;
             case "DELETEFROMCART":
                 //TODO
@@ -221,7 +298,7 @@ public class Request {
                 int daneosid= rs.getInt(1);
 
                 ps=con.prepareStatement(INSERT_KLIENT);
-                stmt.executeUpdate("INSERT INTO koszyk(wartosc_koszyka) VALUES (null);");
+                stmt.executeUpdate("INSERT INTO koszyk(produkt_list,wartosc_koszyka) VALUES (JSON_ARRAY(), 0);");
                 rs=stmt.executeQuery("SELECT koszyk_ID FROM koszyk order by koszyk_ID desc limit 1");
                 rs.next();
                 int koszykid= rs.getInt(1);
