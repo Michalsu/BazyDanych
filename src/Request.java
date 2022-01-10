@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class Request {
 
@@ -32,8 +34,10 @@ public class Request {
                 }
                 break;
             case "ADDTOCART":
-                 sb = new StringBuilder();
+
+                sb = new StringBuilder();
                 sb.append("SELECT koszyk_id FROM klient WHERE login LIKE '%" + substrings[1] +"%'");
+
                  query=sb.toString();
 
                  int koszyk_id = 0;
@@ -46,13 +50,108 @@ public class Request {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+
                 sb.setLength(0);
-                sb.append("UPDATE koszyk \n" +
-                                "SET produkt_list = CASE WHEN CAST(produkt_list AS CHAR) = '[]'  \n" +
-                                "                 THEN JSON_SET('{}', '$.produkty'," +substrings[2]+" )\n" +
-                                "                 ELSE JSON_ARRAY_APPEND(produkt_list, '$.produkty'," +substrings[2]+" ) \n" +
-                                "              END\n" +
-                                "where koszyk_ID = " + koszyk_id );
+                sb.append("SELECT COUNT(*) FROM koszyk_produkt WHERE koszyk_ID = "
+                                 + koszyk_id + " AND  produkt_ID = " + substrings[2]);
+
+
+                query=sb.toString();
+                int count = 0;
+                try {
+
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery(query);
+                    rs.next();
+                    count = rs.getInt(1);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                if(count==0){
+                    sb.setLength(0);
+                    sb.append("UPDATE koszyk \n" +
+                            "SET produkt_list = CASE WHEN CAST(produkt_list AS CHAR) = '[]'  \n" +
+                            "                 THEN JSON_SET('{}', '$.produkty'," +substrings[2]+" )\n" +
+                            "                 ELSE JSON_ARRAY_APPEND(produkt_list, '$.produkty'," +substrings[2]+" ) \n" +
+                            "              END\n" +
+                            "where koszyk_ID = " + koszyk_id );
+                    query=sb.toString();
+                    try {
+                        Statement stmt=con.createStatement();
+                        int rs=stmt.executeUpdate(query);
+
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    sb.setLength(0);
+                    sb.append("INSERT INTO koszyk_produkt VALUES( '" + koszyk_id +"' , '" + substrings[2] + "' , '"+ substrings[3]+ "' )"  );
+                query=sb.toString();
+
+                try {
+                    Statement stmt=con.createStatement();
+                    int rs=stmt.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }}
+                else
+                {
+                    sb.setLength(0);
+                    sb.append("UPDATE koszyk_produkt SET liczba_sztuk = " + substrings[3] + " where koszyk_ID = " +koszyk_id +
+                            " AND produkt_id = " + substrings[2] );
+                    query=sb.toString();
+
+                    try {
+                        Statement stmt=con.createStatement();
+                        int rs=stmt.executeUpdate(query);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+
+
+
+                sb.setLength(0);
+                sb.append("SELECT JSON_EXTRACT(produkt_list, \"$.produkty\") FROM koszyk where koszyk_ID = "+ koszyk_id);
+                query=sb.toString();
+
+                String produkty = null;
+                float wartosc_koszyka =0;
+
+                try {
+
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery(query);
+                    rs.next();
+                    produkty = rs.getString(1);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+
+                if(produkty.length()==1)
+                {
+                    sb.setLength(0);
+                    sb.append("SELECT cena FROM produkt WHERE produkt_id = " + produkty);
+                    query=sb.toString();
+
+                    float cena = 0;
+                    try {
+
+                        Statement stmt=con.createStatement();
+                        ResultSet rs=stmt.executeQuery(query);
+                        rs.next();
+                        cena = rs.getFloat(1);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    wartosc_koszyka=  Float.parseFloat(substrings[3]) * cena;
+
+
+                sb.setLength(0);
+                sb.append("UPDATE koszyk SET wartosc_koszyka = "+ wartosc_koszyka +  "WHERE (koszyk_ID =" + koszyk_id + " )");
                 query=sb.toString();
                 try {
                     Statement stmt=con.createStatement();
@@ -60,19 +159,20 @@ public class Request {
 
                 } catch (SQLException e) {
                     e.printStackTrace();
-                }
-                sb.setLength(0);
-                sb.append("INSERT INTO koszyk_produkt VALUES( '" + koszyk_id +"' , '" + substrings[2] + "' , '"+ substrings[3]+ "' )"  );
-                query=sb.toString();
 
-                try {
-                    Statement stmt=con.createStatement();
-                    int rs=stmt.executeUpdate(query);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+
+                }}
+                else
+                {
+                int[] products = Arrays.stream(produkty.substring(1, produkty.length()-1).split(","))
+                        .map(String::trim).mapToInt(Integer::parseInt).toArray();
+
+
+
+                for(int i = 0; i<products.length;i++ )
+                {
                 sb.setLength(0);
-                sb.append("SELECT cena FROM produkt WHERE produkt_id = " +substrings[2] );
+                sb.append("SELECT cena FROM produkt WHERE produkt_id = " +products[i]);
                 query=sb.toString();
 
                 float cena = 0;
@@ -85,25 +185,26 @@ public class Request {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+                    int productc_count = 0;
+                    sb.setLength(0);
+                    sb.append("SELECT liczba_sztuk FROM koszyk_produkt WHERE produkt_id = " +products[i] +
+                            " and koszyk_ID = "+ koszyk_id);
+                    query=sb.toString();
+
+                    try {
+
+                        Statement stmt=con.createStatement();
+                        ResultSet rs=stmt.executeQuery(query);
+                        rs.next();
+                        productc_count = rs.getInt(1);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
 
 
-                float wartosc_koszyka =0;
-
-                sb.setLength(0);
-                sb.append("SELECT wartosc_koszyka FROM koszyk WHERE koszyk_ID = " + koszyk_id );
-                query=sb.toString();
-
-                try {
-
-                    Statement stmt=con.createStatement();
-                    ResultSet rs=stmt.executeQuery(query);
-                    rs.next();
-                    wartosc_koszyka = rs.getFloat(1);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                wartosc_koszyka = wartosc_koszyka +  productc_count * cena;
                 }
 
-                    wartosc_koszyka = wartosc_koszyka +  cena * Float.parseFloat(substrings[3]);
                 sb.setLength(0);
                 sb.append("UPDATE koszyk SET wartosc_koszyka = "+ wartosc_koszyka +  "WHERE (koszyk_ID =" + koszyk_id + " )");
                 query=sb.toString();
@@ -113,7 +214,7 @@ public class Request {
 
                 } catch (SQLException e) {
                     e.printStackTrace();
-                }
+                }}
                 break;
             case "DELETEFROMCART":
                 //TODO
