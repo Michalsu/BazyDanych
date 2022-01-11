@@ -13,6 +13,11 @@ public class tester {
 
 
 
+
+       // Request.addEmployee(con, "p252818", "A!2345678","Michał","Sujewicz",123456789,"ms@poczta.pl",12345,"Poziomkowa",12,1,"admin");
+
+
+
         //stmt.executeUpdate("INSERT INTO `dane osobowe`(adres_id, Imie,Nazwisko,nr_telefonu,mail) VALUES (1, 'Adam', 'Nowak' ,1243 ,'adaaa@bat.pl')");
 
         //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);

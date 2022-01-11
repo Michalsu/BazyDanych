@@ -1,12 +1,12 @@
 import java.sql.*;
 import java.util.Arrays;
-import java.util.List;
 
 public class Request {
 
     private static final String INSERT_DANE_OSOBOWE = "INSERT INTO dane_osobowe(adres_id, Imie,Nazwisko,nr_telefonu,mail) VALUES (?,?,?,?,?)";
     private static final String INSERT_KLIENT = "INSERT INTO klient(koszyk_ID, `dane_osobowe_ID`, login, haslo) VALUES (?,?,?,?)";
     private static final String INSERT_ADRES = "INSERT INTO adres(kod_pocztowy, ulica, numer) VALUES (?,?,?)";
+    private static final String INSERT_EMPLOYEE = "INSERT INTO pracownik(dane_osobowe_ID, placowka_id, login, haslo, funkcja) VALUES (?,?,?,?,?)";
     private static final String SELECT_LOGIN = "SELECT login, haslo FROM klient WHERE login = ?";
 
     public static void parseRequest(String request, Connection con){
@@ -240,11 +240,14 @@ public class Request {
                 }
                 break;
             case "REGISTER":
-                //TODO
-                //
-                //
-                //
-                //
+                int reg=-1;
+                if(substrings.length==10){
+                    reg = register(con,substrings[1],substrings[2],substrings[3],substrings[4],
+                            Integer.parseInt(substrings[5]),substrings[6],Integer.parseInt(substrings[7]),
+                            substrings[8],Integer.parseInt(substrings[9]));
+                }
+
+                else System.out.println("Błędny ciąg");
                 break;
             case "ADDPRODUCT":
                  sb = new StringBuilder();
@@ -278,8 +281,12 @@ public class Request {
                     int rs=stmt.executeUpdate(query);
                 } catch (SQLException e) {
                     e.printStackTrace();
+
+                }
                 break;
-        }
+            case "ADDEMPLOYEE":
+
+                break;
         }
     }
 
@@ -468,7 +475,7 @@ public class Request {
     }
 
 
-    public static int register(Connection con, String logi, String haslo, String imie, String nazwisko, int numerTel,String mail, int kodPoczt, String ulica, int numeerMiesz){
+    public static int register(Connection con, String logi, String haslo, String imie, String nazwisko, int numerTel,String mail, int kodPoczt, String ulica, int numerMiesz){
         if(DataSecurity.containIllegalSymbols(logi)) return -3;
         if(DataSecurity.containIllegalSymbols(haslo)) return -4;
 
@@ -490,7 +497,7 @@ public class Request {
                 ps = con.prepareStatement(INSERT_ADRES);
                 ps.setInt(1,kodPoczt);
                 ps.setString(2,ulica);
-                ps.setInt(3,numeerMiesz);
+                ps.setInt(3, numerMiesz);
                 ps.executeUpdate();
 
 
@@ -520,14 +527,62 @@ public class Request {
                 ps.setInt(2,daneosid);
                 ps.setString(3,logi);
                 ps.setString(4,DataSecurity.getHashSHA512(haslo,DataSecurity.getSalt()));
-
-                System.out.println(DataSecurity.getHashSHA512(haslo,DataSecurity.getSalt()).length());
                 ps.executeUpdate();
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return -1;
+    }
+
+    public static int addEmployee(Connection con, String logi, String haslo, String imie, String nazwisko, int numerTel,String mail, int kodPoczt, String ulica, int numerMiesz, int placowka, String funkcja){
+        try {
+
+            Statement stmt;
+            PreparedStatement ps = con.prepareStatement(SELECT_LOGIN);
+            ps.setString(1, logi);
+            ResultSet rs= ps.executeQuery();
+            if (rs.next() == true) {
+                return -2;
+            } else {
+                stmt=con.createStatement();
+
+                ps = con.prepareStatement(INSERT_ADRES);
+                ps.setInt(1,kodPoczt);
+                ps.setString(2,ulica);
+                ps.setInt(3, numerMiesz);
+                ps.executeUpdate();
+
+                rs=stmt.executeQuery("SELECT adres_id FROM adres order by adres_id desc limit 1");
+                rs.next();
+                int adresid= rs.getInt(1);
+                ps = con.prepareStatement(INSERT_DANE_OSOBOWE);
+                ps.setInt(1,adresid);
+                ps.setString(2,imie);
+                ps.setString(3,nazwisko);
+                ps.setInt(4,numerTel);
+                ps.setString(5,mail);
+                ps.executeUpdate();
+                
+                rs=stmt.executeQuery("SELECT dane_osobowe_ID FROM dane_osobowe order by dane_osobowe_ID desc limit 1");
+                rs.next();
+                int daneosid= rs.getInt(1);
+
+                ps=con.prepareStatement(INSERT_EMPLOYEE);
+                ps.setInt(1,daneosid);
+                ps.setInt(2,placowka);
+                ps.setString(3,logi);
+                ps.setString(4,DataSecurity.getHashSHA512(haslo,DataSecurity.getSalt()));
+                ps.setString(5, funkcja);
+                ps.executeUpdate();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
         return -1;
     }
 
