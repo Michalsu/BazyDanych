@@ -6,6 +6,8 @@ public class Request {
     private static final String INSERT_DANE_OSOBOWE = "INSERT INTO dane_osobowe(adres_id, Imie,Nazwisko,nr_telefonu,mail) VALUES (?,?,?,?,?)";
     private static final String INSERT_KLIENT = "INSERT INTO klient(koszyk_ID, `dane_osobowe_ID`, login, haslo) VALUES (?,?,?,?)";
     private static final String INSERT_ADRES = "INSERT INTO adres(kod_pocztowy, ulica, numer) VALUES (?,?,?)";
+    private static final String INSERT_MAGAZYN = "INSERT INTO magazyn(przestrzen_magazynowa) VALUES (?)";
+    private static final String INSERT_PLACOWKA = "INSERT INTO placowka(adres_id, magazyn_ID, nazwa) VALUES (?,?,?)";
     private static final String INSERT_EMPLOYEE = "INSERT INTO pracownik(dane_osobowe_ID, placowka_id, login, haslo, funkcja) VALUES (?,?,?,?,?)";
     private static final String SELECT_LOGIN = "SELECT login, haslo FROM klient WHERE login = ?";
 
@@ -13,6 +15,7 @@ public class Request {
         if(request == "")return;
         String[] substrings = request.split("#");
         int parimeters=substrings.length;
+        int exCode=-1;
         switch(substrings[0]){
             case "LOGIN":
                 login(con, substrings[1],substrings[2]);
@@ -240,9 +243,9 @@ public class Request {
                 }
                 break;
             case "REGISTER":
-                int reg=-1;
+
                 if(substrings.length==10){
-                    reg = register(con,substrings[1],substrings[2],substrings[3],substrings[4],
+                    exCode = register(con,substrings[1],substrings[2],substrings[3],substrings[4],
                             Integer.parseInt(substrings[5]),substrings[6],Integer.parseInt(substrings[7]),
                             substrings[8],Integer.parseInt(substrings[9]));
                 }
@@ -286,6 +289,13 @@ public class Request {
                 break;
             case "ADDEMPLOYEE":
 
+                    exCode = addEmployee(con,substrings[1],substrings[2],substrings[3],substrings[4],
+                            Integer.parseInt(substrings[5]),substrings[6],Integer.parseInt(substrings[6]),
+                            substrings[7],Integer.parseInt(substrings[8]),Integer.parseInt(substrings[9]),substrings[10]);
+                break;
+            case "ADDOUTPOST":
+                    exCode = addOutpost(con,Integer.parseInt(substrings[1]),Integer.parseInt(substrings[2]),
+                            substrings[3],Integer.parseInt(substrings[4]),substrings[5]);
                 break;
         }
     }
@@ -528,11 +538,50 @@ public class Request {
                 ps.setString(3,logi);
                 ps.setString(4,DataSecurity.getHashSHA512(haslo,DataSecurity.getSalt()));
                 ps.executeUpdate();
+
+                return 0;
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return -1;
+    }
+
+
+    public static int addOutpost(Connection con, int rozmiarMagazynu, int kodPoczt, String ulica, int numerBudynku, String nazwaPlacowki){
+        try {
+            PreparedStatement ps;
+            Statement stmt=con.createStatement();
+            ResultSet rs;
+
+            ps = con.prepareStatement(INSERT_MAGAZYN);
+            ps.setInt(1, rozmiarMagazynu);
+            ps.executeUpdate();
+            rs=stmt.executeQuery("SELECT magazyn_ID FROM magazyn order by magazyn_ID desc limit 1");
+            rs.next();
+            int magazynID= rs.getInt(1);
+
+            ps = con.prepareStatement(INSERT_ADRES);
+            ps.setInt(1,kodPoczt);
+            ps.setString(2,ulica);
+            ps.setInt(3, numerBudynku);
+            ps.executeUpdate();
+            rs=stmt.executeQuery("SELECT adres_id FROM adres order by adres_id desc limit 1");
+            rs.next();
+            int adresid= rs.getInt(1);
+
+            ps = con.prepareStatement(INSERT_PLACOWKA);
+            ps.setInt(1,adresid);
+            ps.setInt(2,magazynID);
+            ps.setString(3, nazwaPlacowki);
+            ps.executeUpdate();
+
+            return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return -1;
     }
 
@@ -576,6 +625,8 @@ public class Request {
                 ps.setString(4,DataSecurity.getHashSHA512(haslo,DataSecurity.getSalt()));
                 ps.setString(5, funkcja);
                 ps.executeUpdate();
+
+                return 0;
             }
 
         } catch (SQLException e) {

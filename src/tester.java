@@ -13,8 +13,8 @@ public class tester {
 
 
 
-
-       // Request.addEmployee(con, "p252818", "A!2345678","Michał","Sujewicz",123456789,"ms@poczta.pl",12345,"Poziomkowa",12,1,"admin");
+        //Request.addOutpost(con,10000, 54321, "Granatowa",22,"Prowizoryczna");
+        Request.addEmployee(con, "p252818", "A!2345678","Michał","Sujewicz",123456789,"ms@poczta.pl",12345,"Poziomkowa",12,1,"admin");
 
 
 
@@ -22,7 +22,7 @@ public class tester {
 
         //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);
        // System.out.println(register);
-        Request.parseRequest("ADDTOCART#Adamnowak#4#1", con);
+       // Request.parseRequest("ADDTOCART#Adamnowak#4#1", con);
         //Request.parseRequest("DELETEFROMCART#Adamnowak#2", con);
 
 /*
