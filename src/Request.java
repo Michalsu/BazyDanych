@@ -12,7 +12,7 @@ public class Request {
     private static final String INSERT_DANE_OSOBOWE = "INSERT INTO dane_osobowe(adres_id, Imie,Nazwisko,nr_telefonu,mail) VALUES (?,?,?,?,?)";
     private static final String INSERT_KLIENT = "INSERT INTO klient(koszyk_ID, `dane_osobowe_ID`, login, haslo) VALUES (?,?,?,?)";
     private static final String INSERT_ADRES = "INSERT INTO adres(kod_pocztowy, ulica, numer) VALUES (?,?,?)";
-    private static final String INSERT_MAGAZYN = "INSERT INTO magazyn(przestrzen_magazynowa) VALUES (?)";
+    private static final String INSERT_MAGAZYN = "INSERT INTO magazyn(przestrzen_magazynowa, maksymalna_przestrzen_magazynowa) VALUES (?, ?)";
     private static final String INSERT_PLACOWKA = "INSERT INTO placowka(adres_id, magazyn_ID, nazwa) VALUES (?,?,?)";
     private static final String INSERT_EMPLOYEE = "INSERT INTO pracownik(dane_osobowe_ID, placowka_id, login, haslo, funkcja) VALUES (?,?,?,?,?)";
     private static final String SELECT_LOGIN = "SELECT login, haslo FROM klient WHERE login = ?";
@@ -143,6 +143,9 @@ public class Request {
                 break;
             case "BUY":
 
+                boolean ifEmpty = false;
+
+
                 sb = new StringBuilder();
                 sb.append("START TRANSACTION;");
                 query=sb.toString();
@@ -171,34 +174,48 @@ public class Request {
                     e.printStackTrace();
                 }
 
+                sb = new StringBuilder();
+                sb.append("SELECT liczba_sztuk FROM koszyk_produkt WHERE koszyk_ID = " + koszyk_id + ";");
+                query=sb.toString();
+                try {
+                    Statement stmt=con.createStatement();
+                    ResultSet rs = stmt.executeQuery(query);
+                    if(!rs.next())
+                            ifEmpty = true;
 
-                List<Pair<Integer,Integer>>  listOfProducts = getProductsFromCart(koszyk_id, con);
-                List<Pair<Integer, Integer>> availableListOfProducts = new ArrayList<>();
-                List<Integer> unavailableListOfProducts;
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
 
-                unavailableListOfProducts =   checkAvailable(listOfProducts, con);
 
-                    if(unavailableListOfProducts.size()==0)
+                if(!ifEmpty) {
+                    List<Pair<Integer, Integer>> listOfProducts = getProductsFromCart(koszyk_id, con);
+                    List<Pair<Integer, Integer>> availableListOfProducts = new ArrayList<>();
+                    List<Integer> unavailableListOfProducts;
+
+                    unavailableListOfProducts = checkAvailable(listOfProducts, con);
+
+
+                    if (unavailableListOfProducts.size() == 0)
                         availableListOfProducts = listOfProducts;
                     else {
                         int i = 0;
-                        while (unavailableListOfProducts.size() != 0)
-                        {
-                            deleteFromCart(unavailableListOfProducts.get(i),koszyk_id,con);
+                        while (unavailableListOfProducts.size() != 0) {
+                            deleteFromCart(unavailableListOfProducts.get(i), koszyk_id, con);
                             unavailableListOfProducts.remove(i);
-                        i++;
+                            i++;
                         }
                     }
 
 
+                    if (availableListOfProducts.size() != 0) {
+                        for (int i = 0; i < availableListOfProducts.size(); i++)
+                            updateMagazine(availableListOfProducts.get(i).getR(), availableListOfProducts.get(i).getL(), con);
 
-                    if(availableListOfProducts.size()!=0) {
-                        for(int i = 0; i<availableListOfProducts.size();i++)
-                            updateMagazine(availableListOfProducts.get(0).getR(),availableListOfProducts.get(0).getL(),con);
 
                         String date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
                         StringBuilder arr = new StringBuilder();
-                        arr.append("[ ");
+                        arr.append("[");
                         for (int i = 0; i < availableListOfProducts.size(); i++) {
                             arr.append(availableListOfProducts.get(i).getR() + ", ");
                         }
@@ -206,70 +223,84 @@ public class Request {
                         arr.append("]");
 
                         sb = new StringBuilder();
-                        sb.append("SELECT wartosc_koszyka FROM koszyk WHERE koszyk_ID = " + koszyk_id +";");
+                        sb.append("SELECT wartosc_koszyka FROM koszyk WHERE koszyk_ID = " + koszyk_id + ";");
 
-                        query=sb.toString();
-                        koszyk_id = 0;
+                        query = sb.toString();
+
                         int price = 0;
                         try {
 
-                            Statement stmt=con.createStatement();
-                            ResultSet rs=stmt.executeQuery(query);
+                            Statement stmt = con.createStatement();
+                            ResultSet rs = stmt.executeQuery(query);
                             rs.next();
-                            price= rs.getInt(1);
-
+                            price = rs.getInt(1);
 
                         } catch (SQLException e) {
                             e.printStackTrace();
 
                         }
 
-                            sb = new StringBuilder();
-                            sb.append("INSERT INTO zamowienie(klient_ID, Data, Stan, Platnosc, SposobDostawy, produkt_list, Wartosc_zamowienia)" +
-                                    " Values( '" + klient_id + "' ,'" + date + "' , '" + substrings[2] + "' , '" + substrings[3] + "' , '" + substrings[4]
-                                    + "' ,'" + arr + "' ,'" + price+ "' );");
-                            query = sb.toString();
-                            try {
-                                Statement stmt = con.createStatement();
-                                int rs = stmt.executeUpdate(query);
+                        sb = new StringBuilder();
+                        sb.append("INSERT INTO zamowienie(klient_ID, Data, Stan, Platnosc, SposobDostawy, produkt_list, Wartosc_zamowienia)" +
+                                " Values( '" + klient_id + "' ,'" + date + "' , '" + substrings[2] + "' , '" + substrings[3] + "' , '" + substrings[4]
+                                + "' ,'" + arr + "' ,'" + price + "' );");
+                        query = sb.toString();
+                        try {
+                            Statement stmt = con.createStatement();
+                            int rs = stmt.executeUpdate(query);
 
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
 
-                            sb = new StringBuilder();
-                            sb.append("UPDATE koszyk SET produkt_list = '[]', `wartosc_koszyka` = '0' WHERE (koszyk_ID = " + koszyk_id + ");");
-                            query = sb.toString();
+                        sb = new StringBuilder();
+                        sb.append("UPDATE koszyk SET produkt_list = '[]', `wartosc_koszyka` = '0' WHERE (koszyk_ID = " + koszyk_id + ");");
+                        query = sb.toString();
 
-                            try {
-                                Statement stmt = con.createStatement();
-                                int rs = stmt.executeUpdate(query);
+                        try {
+                            Statement stmt = con.createStatement();
+                            int rs = stmt.executeUpdate(query);
 
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
-                            sb = new StringBuilder();
-                            sb.append("DELETE FROM koszyk_produkt WHERE (koszyk_ID = " + koszyk_id + ");");
-                            query = sb.toString();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                        sb = new StringBuilder();
+                        sb.append("DELETE FROM koszyk_produkt WHERE (koszyk_ID = " + koszyk_id + ");");
+                        query = sb.toString();
 
-                            try {
-                                Statement stmt = con.createStatement();
-                                int rs = stmt.executeUpdate(query);
+                        try {
+                            Statement stmt = con.createStatement();
+                            int rs = stmt.executeUpdate(query);
 
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
                     }
 
-                sb = new StringBuilder();
-                sb.append("COMMIT;");
-                query=sb.toString();
-                try {
-                    Statement stmt=con.createStatement();
-                    ResultSet rs = stmt.executeQuery(query);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+
+                    sb = new StringBuilder();
+                    sb.append("COMMIT;");
+                    query = sb.toString();
+                    try {
+                        Statement stmt = con.createStatement();
+                        ResultSet rs = stmt.executeQuery(query);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                    sb = new StringBuilder();
+                    sb.append("SELECT magazyn_ID from magazyn;");
+                    query = sb.toString();
+                    try {
+                        Statement stmt = con.createStatement();
+                        ResultSet rs = stmt.executeQuery(query);
+                        while (rs.next())
+                            updateStorageSpace(rs.getInt(1), con);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
+
                 break;
             case "LOGOUT":
                 //TODO
@@ -284,7 +315,7 @@ public class Request {
                 sb.append("SELECT cena FROM produkt WHERE produkt_id = " + substrings[1] + " ;");
                 sb2.append("SELECT cena FROM produkt WHERE produkt_id = " + substrings[2] + " ;");
                 query=sb.toString();
-                System.out.println(sb);
+
                 String query2 = sb2.toString();
                 int price1=0;
                 int price2=0;
@@ -314,6 +345,7 @@ public class Request {
                 else System.out.println("Błędny ciąg");
                 break;
             case "ADDPRODUCT":
+
                  sb = new StringBuilder();
                 sb.append("INSERT INTO produkt(produkt_id, cena, promocja, nazwa, opis, kategoria_id) VALUES");
                 sb.append("(' " + substrings[1] + "',");
@@ -329,6 +361,57 @@ public class Request {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+                break;
+            case "ADDPRODUCTTOMAGAZINE":
+
+
+                boolean ifExist = false;
+                sb = new StringBuilder();
+                sb.append("SELECT liczba_produktow FROM magazyn_produkt where magazyn_ID = " + substrings[1] +
+                        " and produkt_ID = " +substrings[2]);
+                query=sb.toString();
+
+
+                try {
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery(query);
+                    if(rs.next())
+                    ifExist = true;
+
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+
+
+                if(!ifExist){
+                sb = new StringBuilder();
+                sb.append(" INSERT INTO magazyn_produkt (magazyn_ID, produkt_ID, liczba_produktow) VALUES ('"+ substrings[1] + "' ,'"+
+                        substrings[2] + "' ,'" + substrings[3] +  "');");
+                query=sb.toString();
+
+                try {
+                    Statement stmt=con.createStatement();
+                    int rs=stmt.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }}
+                else
+                {
+                    sb = new StringBuilder();
+                    sb.append(" UPDATE magazyn_produkt SET liczba_produktow = " + substrings[3] + " where magazyn_ID = " + substrings[1] +
+                            " and produkt_ID = " +substrings[2]);
+                    query=sb.toString();
+
+                    try {
+                        Statement stmt=con.createStatement();
+                        int rs=stmt.executeUpdate(query);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }}
+
+                updateStorageSpace(Integer.parseInt(substrings[1]),con);
                 break;
             case "CHANGEPRODUCT":
 
@@ -423,6 +506,7 @@ public class Request {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         String[] items = produkty.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
 
         int[] products = new int[items.length];
@@ -431,7 +515,6 @@ public class Request {
             try {
                 products[i] = Integer.parseInt(items[i]);
             } catch (NumberFormatException nfe) {
-                //NOTE: write something here if you need to recover from formatting errors
             }};
 
     int count = 0;
@@ -462,6 +545,93 @@ public class Request {
 
         return  listOfProducts;
     }
+
+    private static void updateStorageSpace(int magazyn_ID,  Connection con)
+    {
+        StringBuilder sb =  new StringBuilder();
+        String query;
+        sb.append("SELECT maksymalna_przestrzen_magazynowa FROM magazyn where magazyn_ID = "+ magazyn_ID + ";");
+        query=sb.toString();
+        int storageSpace = 0;
+        try {
+
+            Statement stmt=con.createStatement();
+            ResultSet rs=stmt.executeQuery(query);
+            rs.next();
+           storageSpace= rs.getInt(1);
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+         sb =  new StringBuilder();
+        sb.append("SELECT liczba_produktow, produkt_ID FROM magazyn_produkt where magazyn_ID = "+ magazyn_ID + ";");
+        query=sb.toString();
+
+        int allCount = 0;
+
+
+        List <Pair<Integer, Integer>> products = new ArrayList<Pair<Integer, Integer>>();
+
+
+        try {
+
+            Statement stmt=con.createStatement();
+            ResultSet rs=stmt.executeQuery(query);
+            while(rs.next()) {
+                Pair pair = new Pair(rs.getInt(1),rs.getInt(2));
+                products.add(pair);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+for (int i = 0; i<products.size();i++)
+    if(products.get(i).getL()==0) {
+
+        sb.setLength(0);
+        sb.append("DELETE FROM magazyn_produkt where magazyn_ID = " + magazyn_ID + " and produkt_ID = " + products.get(i).getR());
+        query = sb.toString();
+        products.remove(i);
+        try {
+            Statement stmt = con.createStatement();
+            int rs = stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+        StringBuilder sb2 =  new StringBuilder();
+
+if(products.size()==0)
+    sb2.append("[]");
+else {
+    for (Pair<Integer, Integer> p : products) {
+        allCount = allCount + p.getL();
+        sb2.append(p.getR() + ",");
+    }
+
+    sb2.insert(0,"[");
+    sb2.deleteCharAt(sb2.length()-1);
+    sb2.append("]");
+}
+         sb =  new StringBuilder();
+        sb.append("UPDATE magazyn SET `lista_produktow_dostepnych` = '" + sb2 + "' , przestrzen_magazynowa = '" + (storageSpace-allCount) + "' WHERE magazyn_ID = " + magazyn_ID);
+        query=sb.toString();
+
+        try {
+            Statement stmt = con.createStatement();
+            int rs = stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+
+
 
     private static void updatePrice(int koszyk_id,  Connection con){
 
@@ -883,6 +1053,7 @@ public class Request {
 
             ps = con.prepareStatement(INSERT_MAGAZYN);
             ps.setInt(1, rozmiarMagazynu);
+            ps.setInt(2,rozmiarMagazynu);
             ps.executeUpdate();
             rs=stmt.executeQuery("SELECT magazyn_ID FROM magazyn order by magazyn_ID desc limit 1");
             rs.next();

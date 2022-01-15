@@ -197,6 +197,7 @@ CREATE TABLE `magazyn` (
                            `magazyn_ID` int NOT NULL AUTO_INCREMENT,
                            `lista_produktow_dostepnych` json DEFAULT NULL,
                            `przestrzen_magazynowa` int NOT NULL,
+                           `maksymalna_przestrzen_magazynowa` int NOT NULL,
                            PRIMARY KEY (`magazyn_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -207,7 +208,7 @@ CREATE TABLE `magazyn` (
 
 LOCK TABLES `magazyn` WRITE;
 /*!40000 ALTER TABLE `magazyn` DISABLE KEYS */;
-INSERT INTO `magazyn` VALUES (1,'[]',10000),(2,'[]',10000),(3,'[]',10000),(4,'[]',10000);
+INSERT INTO `magazyn` VALUES (1,'[]',10000,1000),(2,'[]',10000,1000),(3,'[]',10000,1000),(4,'[]',10000,1000);
 /*!40000 ALTER TABLE `magazyn` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -160,8 +160,15 @@ class ClientThread implements Runnable {
         final String USERNAME = "root";
         final String PASSWORD = "root";
         final String MAX_POOL = "250";
-        JavaSqlCommunication j = new JavaSqlCommunication(DATABASE_URL, USERNAME, PASSWORD, "baza");
+      //  JavaSqlCommunication j = new JavaSqlCommunication(DATABASE_URL, USERNAME, PASSWORD, "baza");
 
+        Connection con= null;
+        try {
+            con = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/baza","root","root");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
 
       /*  try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -214,14 +221,14 @@ class ClientThread implements Runnable {
                     socket.close();
                     socket=null;
                 }
-                else if (actualValue[0].equals("sent")&& actualValue.length==1)
+                else if (actualValue[0].equals("buy1")&& actualValue.length==1)
                 {
+                     Request.parseRequest("BUY#Adamnowak#gotowe#karta#dodomu", con);
 
-                    String index = String.valueOf(j.selectLast("adres_id",  "adres")+1);
-
-                    String c = "adres_id,kod_pocztowy,ulica,numer";
-                    String a = index+ "', '321' ,'ds', '23";
-                    j.insertText(a,c,"adres");
+                }
+                else if (actualValue[0].equals("buy")&& actualValue.length==1)
+                {
+                    Request.parseRequest("BUY#Adam#gotowe#karta#dodomu", con);
 
                 }
             }

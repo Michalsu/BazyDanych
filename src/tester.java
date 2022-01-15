@@ -13,7 +13,8 @@ public class tester {
                 "jdbc:mysql://127.0.0.1:3306/baza","root","root");
 
 
-
+     //   new Client("c1","localhost");
+     //   new Client("c2","localhost");
         //Request.addOutpost(con,10000, 54321, "Granatowa",22,"Prowizoryczna");
         //Request.addEmployee(con, "p252818", "A!2345678","Michał","Sujewicz",123456789,"ms@poczta.pl",12345,"Poziomkowa",12,1,"admin");
 
@@ -23,16 +24,20 @@ public class tester {
 
         //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);
        // System.out.println(register);
-        Request.parseRequest("ADDTOCART#Adamnowak#1#5", con);
-        Request.parseRequest("ADDTOCART#Adamnowak#2#5", con);
-
+    //    Request.parseRequest("ADDTOCART#Adamnowak#1#5", con);
+    // Request.parseRequest("ADDTOCART#Adamnowak#2#2", con);
+    //    Request.parseRequest("ADDTOCART#Adamnowak#3#2", con);
+    //    Request.parseRequest("ADDTOCART#Adam#2#2", con);
+    //  Request.parseRequest("ADDTOCART#Adam#3#2", con);
+      //  Request.parseRequest("ADDPRODUCTTOMAGAZINE#2#1#222", con);
         //    Request.parseRequest("ADDTOCART#adam#2#3", con);
        // Request.parseRequest("ADDTOCART#Adam#1#5", con);
-
+  //Request.parseRequest("ADDPRODUCTTOMAGAZINE#2#3#2", con);
         // Request.parseRequest("CHANGEPRODUCT#1#1000#1#dasda#dsadas#1", con);
       //       Request.parseRequest("DELETEFROMCART#Adamnowak#2", con);
-      Request.parseRequest("BUY#Adamnowak#gotowe#karta#dodomu", con);
-       // Request.parseRequest("BUY#Adam#gotowe#karta#dodomu", con);
+   // Request.parseRequest("BUY#Adamnowak#gotowe#karta#dodomu", con);
+      //  Request.parseRequest("BUY#Adam#gotowe#karta#dodomu", con);
+
 
 /*
         String salt = DataSecurity.getSalt();
