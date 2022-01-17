@@ -38,7 +38,7 @@ public class Request {
                 break;
             case "SEARCH":
                 StringBuilder sb = new StringBuilder();
-                sb.append("SELECT p.produkt_ID as ID, p.cena, p.Promocja, p.nazwa, p.opis, k.Nazwa as kategoria FROM baza.produkt p, baza.kategoria k WHERE p.nazwa LIKE '%");
+                sb.append("SELECT p.produkt_ID as ID, p.cena, p.Promocja, p.nazwa, p.opis, k.Nazwa as kategoria FROM baza.produkt p JOIN baza.kategoria k ON p.kategoria_ID=k.kategoria_ID WHERE p.nazwa LIKE '%");
                 if(parimeters>1){
                     for(int i=1;i<parimeters-1;i++){
                         sb.append(substrings[i]);
@@ -67,7 +67,7 @@ public class Request {
                     }
                     ab.insert(0,"SEARCH#"+i+"#");
                     response= ab.toString();
-                    //System.out.println(response);
+                    System.out.println(response);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
