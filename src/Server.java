@@ -26,8 +26,7 @@ public class Server  extends JFrame implements  Runnable{
     public static void main(String[] args) throws Exception {
 
         new Server();
-        con=DriverManager.getConnection(
-                "jdbc:mysql://127.0.0.1:3306/baza","root","root");
+        con=DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/baza","root","root");
 
 
 
@@ -111,17 +110,6 @@ public class Server  extends JFrame implements  Runnable{
             }
         }
 
-        try{
-            Connection con=DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/baza","root","root");
-            Statement stmt=con.createStatement();
-            ResultSet rs=stmt.executeQuery("select * from produkt");
-            while(rs.next())
-                System.out.println(rs.getInt(1)+"  "+rs.getString(2)+"  "+
-                        rs.getString(3)+"  "+rs.getString(4)+"  "+rs.getString(5));
-            con.close();
-        }catch(Exception e){ System.out.println(e);}
-
 
     }
 
@@ -133,6 +121,8 @@ class ClientThread implements Runnable {
     private Socket socket;
     private String name;
     private Server myServer;
+    private String login;
+    private String password;
 
 
     private ObjectOutputStream outputStream = null;
@@ -170,7 +160,6 @@ class ClientThread implements Runnable {
         final String USERNAME = "root";
         final String PASSWORD = "root";
         final String MAX_POOL = "250";
-      //  JavaSqlCommunication j = new JavaSqlCommunication(DATABASE_URL, USERNAME, PASSWORD, "baza");
 
         Connection con= null;
         try {
@@ -182,14 +171,48 @@ class ClientThread implements Runnable {
 
 
 
-
-
         try( ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream input = new ObjectInputStream(socket.getInputStream()); )
         {
+
+            boolean ifDataCorrect = false;
+            boolean ifLogin =false;
+            String text;
             outputStream = output;
             name = (String)input.readObject();
-            myServer.addClient(this);
+            while(!ifDataCorrect) {
+                 text = "Wpisz login";
+                output.writeObject(text);
+                login = (String)input.readObject();
+             text = "Wpisz hasło";
+            output.writeObject(text);
+            password = (String)input.readObject();
+            switch(Request.login(con,login,password))
+            {
+                case 0:
+                    text = "Zalogowano";
+                    output.writeObject(text);
+                    ifDataCorrect=true;
+                    ifLogin=true;
+                    myServer.addClient(this);
+                    break;
+
+                case -1:
+                    text = "Nieprawidłowe hasło";
+                    output.writeObject(text);
+                    break;
+                case -2:
+                    text = "Nieprawidłowy login";
+                    output.writeObject(text);
+                    break;
+
+
+            }
+
+            }
+
+
+
             while(true){
                 message = (String)input.readObject();
                 String[] actualValue = message.split(" ");
@@ -210,7 +233,7 @@ class ClientThread implements Runnable {
                 }
                 else
                 {
-                     Request.parseRequest(actualValue[0], con);
+                     Request.parseRequest(actualValue[0] , con);
 
                 }
 
@@ -230,8 +253,8 @@ class otherThreads {
 int i =0;
     public otherThreads(int hours) {
         timer = new Timer();
-        timer.schedule(new MakeBackup(), 60*60*hours*1000,60*60*hours*1000);    //urochomienie wątku co 24 godziny
-        timer.schedule(new changeOrders() , 365*60*60*hours*1000,365* 60*60*hours*1000 ); //usuwanie danych nieatywnych klientow co rok
+        timer.schedule(new MakeBackup(), 60*60*1000,60*60*hours*1000);    //urochomienie wątku co 24 godziny
+        timer.schedule(new changeOrders() , 1000,60*60*hours*1000 );
 
     }
 
