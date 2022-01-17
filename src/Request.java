@@ -17,27 +17,52 @@ public class Request {
     private static final String INSERT_EMPLOYEE = "INSERT INTO pracownik(dane_osobowe_ID, placowka_id, login, haslo, funkcja) VALUES (?,?,?,?,?)";
     private static final String SELECT_LOGIN = "SELECT login, haslo FROM klient WHERE login = ?";
 
-    public static void parseRequest(String request, Connection con){
-        if(request == "")return;
+    public static String parseRequest(String request, Connection con){
+        if(request == "")return "ERROR";
         String[] substrings = request.split("#");
         int parimeters=substrings.length;
         int exCode=-1;
+        String response ="ERROR";
         switch(substrings[0]){
             case "LOGIN":
-                login(con, substrings[1],substrings[2]);
+                exCode=login(con, substrings[1],substrings[2]);
+                if(exCode==0) response = "LOGIN#SUCCESSFUL";
+                else if(exCode==-1) response = "LOGIN#WRONGPASS";
+                else if(exCode==-2) response = "LOGIN#WRONGNAME";
+                else response = "LOGIN#ERROR";
                 break;
             case "SEARCH":
                 StringBuilder sb = new StringBuilder();
-                sb.append("SELECT * FROM produkt WHERE nazwa LIKE '%");
-                for(int i=1;i<parimeters-1;i++){
-                    sb.append(substrings[i]);
-                    sb.append("%' OR '%");
+                sb.append("SELECT p.produkt_ID as ID, p.cena, p.Promocja, p.nazwa, p.opis, k.Nazwa as kategoria FROM baza.produkt p, baza.kategoria k WHERE p.nazwa LIKE '%");
+                if(parimeters>1){
+                    for(int i=1;i<parimeters-1;i++){
+                        sb.append(substrings[i]);
+                        sb.append("%' OR p.nazwa LIKE '%");
+                    }
+                    sb.append(substrings[parimeters-1]);
                 }
                 sb.append("%';");
+
                 String query=sb.toString();
+                System.out.println(query);
                 try {
                     Statement stmt=con.createStatement();
                     ResultSet rs=stmt.executeQuery(query);
+                    int i=0;
+                    StringBuilder ab= new StringBuilder();
+                    while(rs.next())
+                    {
+                        response = rs.getFloat("cena")+"#"+ rs.getInt("Promocja") +"#"+
+                                rs.getString("nazwa")+ "#"+rs.getString("opis")+"#"+
+                                rs.getString("kategoria")+"#"+
+                                rs.getInt("ID")+"\n";
+                        i++;
+                        ab.append(response);
+
+                    }
+                    ab.insert(0,"SEARCH#"+i+"#");
+                    response= ab.toString();
+                    //System.out.println(response);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -483,6 +508,7 @@ public class Request {
                             substrings[3],Integer.parseInt(substrings[4]),substrings[5]);
                 break;
         }
+        return response;
     }
 
     private static List<Pair<Integer,Integer>> getProductsFromCart(int koszyk_id,  Connection con)

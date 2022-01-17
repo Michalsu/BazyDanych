@@ -13,6 +13,8 @@ public class tester {
                 "jdbc:mysql://127.0.0.1:3306/baza","root","root");
 
 
+        String req = "SEARCH#";
+        Request.parseRequest(req, con);
      //   new Client("c1","localhost");
      //   new Client("c2","localhost");
         //Request.addOutpost(con,10000, 54321, "Granatowa",22,"Prowizoryczna");
