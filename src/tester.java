@@ -1,11 +1,10 @@
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Arrays;
+import java.util.Random;
 
 public class tester {
+    private static final String INSERT_EMPLOYEE = "INSERT INTO pracownik(dane_osobowe_ID, placowka_id, login, haslo, funkcja) VALUES (?,?,?,?,?)";
 
     public static void main(String[] args) throws Exception {
 
@@ -24,19 +23,19 @@ public class tester {
 
         //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);
        // System.out.println(register);
-    //    Request.parseRequest("ADDTOCART#Adamnowak#1#5", con);
+    //   Request.parseRequest("ADDTOCART#Login5#1#5", con);
     // Request.parseRequest("ADDTOCART#Adamnowak#2#2", con);
-    //    Request.parseRequest("ADDTOCART#Adamnowak#3#2", con);
+    //   Request.parseRequest("ADDTOCART#Adamnowak#1#2", con);
     //    Request.parseRequest("ADDTOCART#Adam#2#2", con);
     //  Request.parseRequest("ADDTOCART#Adam#3#2", con);
-      //  Request.parseRequest("ADDPRODUCTTOMAGAZINE#2#1#222", con);
+       // Request.parseRequest("ADDPRODUCTTOMAGAZINE#2#1#1", con);
         //    Request.parseRequest("ADDTOCART#adam#2#3", con);
        // Request.parseRequest("ADDTOCART#Adam#1#5", con);
   //Request.parseRequest("ADDPRODUCTTOMAGAZINE#2#3#2", con);
         // Request.parseRequest("CHANGEPRODUCT#1#1000#1#dasda#dsadas#1", con);
       //       Request.parseRequest("DELETEFROMCART#Adamnowak#2", con);
-   // Request.parseRequest("BUY#Adamnowak#gotowe#karta#dodomu", con);
-      //  Request.parseRequest("BUY#Adam#gotowe#karta#dodomu", con);
+  //  Request.parseRequest("BUY#Login5#gotowe#karta#dodomu", con);
+    //  Request.parseRequest("LOGOUT", con);
 
 
 /*
@@ -63,7 +62,12 @@ public class tester {
 
          */
 
+
+
+
+
     }
+
 
 
 }

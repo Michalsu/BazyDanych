@@ -1,5 +1,8 @@
+import java.io.File;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.URISyntaxException;
+import java.security.CodeSource;
 import java.sql.*;
 
 
@@ -7,6 +10,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Timer;
+import java.util.stream.IntStream;
 
 import javax.swing.*;
 
@@ -52,6 +59,8 @@ public class Server  extends JFrame implements  Runnable{
         setVisible(true);
         new Thread(this).start();// Uruchomienie dodatkowego watka
         // czekajacego na nowych klientow
+        new otherThreads(24);    // odpalenie wątków do robienia kopii zapasowej oraz usuwania nieaktywnych klientow
+
 
     }
 
@@ -89,6 +98,7 @@ public class Server  extends JFrame implements  Runnable{
                     // Tworzy nowy w�tek do obs�ugi klienta, kt�re
                     // w�a�nie po��czy� si� z serwerem.
                     new ClientThread(this, socket);
+
                 }
             }
         } catch (IOException e) {
@@ -242,4 +252,215 @@ class ClientThread implements Runnable {
     }
 
 }
+class otherThreads {
+    Timer timer;
+int i =0;
+    public otherThreads(int hours) {
+        timer = new Timer();
+        timer.schedule(new MakeBackup(), 60*60*hours*1000,60*60*hours*1000);    //urochomienie wątku co 24 godziny
+        timer.schedule(new changeOrders() , 365*60*60*hours*1000,365* 60*60*hours*1000 ); //usuwanie danych nieatywnych klientow co rok
 
+    }
+
+    //
+    public void checkOrders() throws SQLException { Connection con= DriverManager.getConnection(
+            "jdbc:mysql://127.0.0.1:3306/baza","root","root");
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+
+        String[] d = date.split("-");
+       int year = Integer.parseInt(d[0]) - 1 ;
+       String newDate = Integer.parseInt(String.valueOf(year)) + "-" +d[1] +"-" + d[2];
+
+StringBuilder sb = new StringBuilder();
+        StringBuilder sb2 = new StringBuilder();
+        StringBuilder sb3 = new StringBuilder();
+        StringBuilder sb4 = new StringBuilder();
+        StringBuilder sb5 = new StringBuilder();
+        StringBuilder sb6 = new StringBuilder();
+        String q2,q3,q4,q5,q6;
+        sb.append("SELECT klient_ID FROM zamowienie WHERE Data = '" + newDate +"';");
+
+        String query  =sb.toString();
+        List<Integer> clientList = new ArrayList<>();
+        try {
+
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next())
+                clientList.add(rs.getInt(1));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+
+        for(int i =0 ;i< clientList.size();i++)
+        {
+            boolean delete = true;
+            sb = new StringBuilder();
+            sb.append("SELECT zamowienie_ID FROM zamowienie WHERE Data > '" + newDate +"' and klient_ID = " + clientList.get(i));
+            query  =sb.toString();
+            try {
+
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery(query);
+                if(rs.next())
+                    delete = false;
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+
+            }
+            if(delete)
+            {
+                int personal_date = 0;
+                sb = new StringBuilder();
+                sb.append("SELECT dane_osobowe_ID FROM klient WHERE klient_ID = " + clientList.get(i));
+                query  =sb.toString();
+                try {
+
+                    Statement stmt = con.createStatement();
+                    ResultSet rs = stmt.executeQuery(query);
+                    rs.next();
+                     personal_date=rs.getInt(1);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+
+                }
+                int cart = 0;
+                sb = new StringBuilder();
+                sb.append("SELECT koszyk_ID FROM klient WHERE klient_ID = " + clientList.get(i));
+                query  =sb.toString();
+                try {
+
+                    Statement stmt = con.createStatement();
+                    ResultSet rs = stmt.executeQuery(query);
+                    rs.next();
+                    cart=rs.getInt(1);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+
+                }
+                int address_id = 0;
+                sb = new StringBuilder();
+                sb.append("SELECT adres_id FROM dane_osobowe WHERE dane_osobowe_ID = " + personal_date);
+                query  =sb.toString();
+                try {
+
+                    Statement stmt = con.createStatement();
+                    ResultSet rs = stmt.executeQuery(query);
+                    rs.next();
+                    address_id=rs.getInt(1);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+
+                }
+
+                sb = new StringBuilder();
+                sb.append("DELETE FROM zamowienie where klient_ID =  " + clientList.get(i));
+                sb2.append("DELETE FROM klient where klient_ID = " + clientList.get(i));
+                sb3.append("DELETE FROM koszyk_produkt where koszyk_ID = " + cart);
+                sb4.append("DELETE FROM koszyk where koszyk_ID = " + cart);
+                sb5.append("DELETE FROM dane_osobowe where dane_osobowe_ID = " +personal_date);
+                sb6.append("DELETE FROM adres where adres_ID = " + address_id);
+                query  =sb.toString();
+                q2  =sb2.toString();
+                q3  =sb3.toString();
+                q4  =sb4.toString();
+                q5  =sb5.toString();
+                q6  =sb6.toString();
+
+                try {
+
+                    Statement stmt = con.createStatement();
+                    int rs = stmt.executeUpdate(query);
+                     rs = stmt.executeUpdate(q2);
+                     rs = stmt.executeUpdate(q3);
+                     rs = stmt.executeUpdate(q4);
+                     rs = stmt.executeUpdate(q5);
+                     rs = stmt.executeUpdate(q6);
+
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+
+                }
+
+            }
+
+
+        }
+
+
+    }
+    public void Backupdbtosql() {
+        try {
+
+            /*NOTE: Getting path to the Jar file being executed*/
+            /*NOTE: YourImplementingClass-> replace with the class executing the code*/
+            CodeSource codeSource = Request.class.getProtectionDomain().getCodeSource();
+            File jarFile = new File(codeSource.getLocation().toURI().getPath());
+            String jarDir = jarFile.getParentFile().getPath();
+
+
+            /*NOTE: Creating Database Constraints*/
+            String dbName = "baza";
+            String dbUser = "root";
+            String dbPass = "root";
+
+            /*NOTE: Creating Path Constraints for folder saving*/
+            /*NOTE: Here the backup folder is created for saving inside it*/
+            String folderPath = jarDir + "\\backup";
+
+            /*NOTE: Creating Folder if it does not exist*/
+            File f1 = new File(folderPath);
+            f1.mkdir();
+
+
+            /*NOTE: Creating Path Constraints for backup saving*/
+            /*NOTE: Here the backup is saved in a folder called backup with the name backup.sql*/
+            String savePath = "\"" + jarDir + "\\backup\\" + "backup.sql\"";
+
+            /*NOTE: Used to create a cmd command*/
+            String executeCmd = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump -u" + dbUser + " -p" + dbPass + " --databases " + dbName + " -r " + savePath;
+
+
+            /*NOTE: Executing the command here*/
+
+            Process runtimeProcess = Runtime.getRuntime().exec(executeCmd);
+            int processComplete = runtimeProcess.waitFor();
+
+
+            if (processComplete == 0) {
+                System.out.println("Backup Complete");
+            } else {
+                System.out.println("Backup Failure");
+            }
+
+
+        } catch (URISyntaxException | IOException | InterruptedException ex) {
+            JOptionPane.showMessageDialog(null, "Error at Backuprestore" + ex.getMessage());
+        }
+    }
+    class MakeBackup extends TimerTask {
+        public void run() {
+            Backupdbtosql();
+
+        }
+    }
+
+        class changeOrders extends TimerTask {
+            public void run() {
+                try {
+                    checkOrders();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        }
+
+
+}

@@ -1,5 +1,10 @@
 import com.mysql.cj.conf.ConnectionUrlParser;
 
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.security.CodeSource;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -303,11 +308,7 @@ public class Request {
 
                 break;
             case "LOGOUT":
-                //TODO
-                //
-                //
-                //
-                //
+
                 break;
             case "COMPARE":
                 StringBuilder sb2 = new StringBuilder();
@@ -365,6 +366,7 @@ public class Request {
             case "ADDPRODUCTTOMAGAZINE":
 
 
+
                 boolean ifExist = false;
                 sb = new StringBuilder();
                 sb.append("SELECT liczba_produktow FROM magazyn_produkt where magazyn_ID = " + substrings[1] +
@@ -383,8 +385,23 @@ public class Request {
                     e.printStackTrace();
                 }
 
+                sb = new StringBuilder();
+                sb.append("SELECT przestrzen_magazynowa FROM magazyn where magazyn_ID = " + substrings[1] );
 
+                query=sb.toString();
 
+            int space =0;
+                try {
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery(query);
+                    rs.next();
+                    space = rs.getInt(1);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                if(space>=Integer.parseInt(substrings[3])){
                 if(!ifExist){
                 sb = new StringBuilder();
                 sb.append(" INSERT INTO magazyn_produkt (magazyn_ID, produkt_ID, liczba_produktow) VALUES ('"+ substrings[1] + "' ,'"+
@@ -412,6 +429,7 @@ public class Request {
                     }}
 
                 updateStorageSpace(Integer.parseInt(substrings[1]),con);
+                }
                 break;
             case "CHANGEPRODUCT":
 
@@ -681,16 +699,19 @@ else {
         {
 
             sb.setLength(0);
-            sb.append("SELECT cena FROM produkt WHERE produkt_id = " + produkty.charAt(1) + ";");
+            sb.append("SELECT cena, Promocja FROM produkt WHERE produkt_id = " + produkty.charAt(1) + ";");
             query=sb.toString();
 
             float cena = 0;
+            float promocja = 0;
+
             try {
 
                 Statement stmt=con.createStatement();
                 ResultSet rs=stmt.executeQuery(query);
                 rs.next();
                 cena = rs.getFloat(1);
+                promocja = rs.getFloat(2);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -711,7 +732,7 @@ else {
             }
 
 
-            wartosc_koszyka = productc_count * cena;
+            wartosc_koszyka = productc_count * cena* ((100-promocja)/100);
 
 
             sb.setLength(0);
@@ -745,16 +766,18 @@ else {
             for(int i = 0; i<products.length;i++ )
             {
                 sb.setLength(0);
-                sb.append("SELECT cena FROM produkt WHERE produkt_id = " +products[i] + ";");
+                sb.append("SELECT cena, Promocja FROM produkt WHERE produkt_id = " +products[i] + ";");
                 query=sb.toString();
 
                 float cena = 0;
+                float promocja = 0;
                 try {
 
                     Statement stmt=con.createStatement();
                     ResultSet rs=stmt.executeQuery(query);
                     rs.next();
                     cena = rs.getFloat(1);
+                    promocja = rs.getFloat(2);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -775,7 +798,7 @@ else {
                 }
 
 
-                wartosc_koszyka = wartosc_koszyka +  productc_count * cena;
+                wartosc_koszyka = wartosc_koszyka +  productc_count * cena * ((100 - promocja/100));
             }
             sb.setLength(0);
             sb.append("UPDATE koszyk SET wartosc_koszyka = "+ wartosc_koszyka +  "WHERE (koszyk_ID =" + koszyk_id + " );");
