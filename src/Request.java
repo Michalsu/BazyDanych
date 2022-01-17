@@ -1,14 +1,6 @@
-import com.mysql.cj.conf.ConnectionUrlParser;
-
-import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.CodeSource;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -20,7 +12,10 @@ public class Request {
     private static final String INSERT_MAGAZYN = "INSERT INTO magazyn(przestrzen_magazynowa, maksymalna_przestrzen_magazynowa) VALUES (?, ?)";
     private static final String INSERT_PLACOWKA = "INSERT INTO placowka(adres_id, magazyn_ID, nazwa) VALUES (?,?,?)";
     private static final String INSERT_EMPLOYEE = "INSERT INTO pracownik(dane_osobowe_ID, placowka_id, login, haslo, funkcja) VALUES (?,?,?,?,?)";
-    private static final String SELECT_LOGIN = "SELECT login, haslo FROM klient WHERE login = ?";
+    private static final String SELECT_LOGIN_USER = "SELECT login, haslo FROM klient WHERE login = ?";
+    private static final String SELECT_LOGIN_EMP = "SELECT login, haslo FROM pracownik WHERE login = ?";
+    private static final String UPDATE_PASSWORD_EMP = "UPDATE pracownik SET haslo = ? WHERE login = ?";
+    private static final String UPDATE_PASSWORD_USER = "UPDATE klient SET haslo = ? WHERE login = ?";
 
     public static String parseRequest(String request, Connection con){
         if(request == "")return "ERROR";
@@ -1026,7 +1021,7 @@ else {
         if(DataSecurity.containIllegalSymbols(nickname)) return -2;
         try {
             Statement stmt=con.createStatement();
-            PreparedStatement ps = con.prepareStatement(SELECT_LOGIN);
+            PreparedStatement ps = con.prepareStatement(SELECT_LOGIN_USER);
             ps.setString(1, nickname);
             ResultSet rs= ps.executeQuery();
             if (rs.next() == false) {
@@ -1049,7 +1044,7 @@ else {
         try {
 
             Statement stmt;
-            PreparedStatement ps = con.prepareStatement(SELECT_LOGIN);
+            PreparedStatement ps = con.prepareStatement(SELECT_LOGIN_USER);
             ps.setString(1, logi);
             //executeQuery("SELECT login FROM klient WHERE login = 'logi'");
             ResultSet rs= ps.executeQuery();
@@ -1145,9 +1140,8 @@ else {
 
     public static int addEmployee(Connection con, String logi, String haslo, String imie, String nazwisko, int numerTel,String mail, int kodPoczt, String ulica, int numerMiesz, int placowka, String funkcja){
         try {
-
             Statement stmt;
-            PreparedStatement ps = con.prepareStatement(SELECT_LOGIN);
+            PreparedStatement ps = con.prepareStatement(SELECT_LOGIN_USER);
             ps.setString(1, logi);
             ResultSet rs= ps.executeQuery();
             if (rs.next() == true) {
@@ -1195,6 +1189,44 @@ else {
         return -1;
     }
 
+    public static int changePassword(Connection con, String nickname, String oldPass, String newPass, String permission){
+        String salt = null;
+        String haslo = null;
+        if(DataSecurity.containIllegalSymbols(nickname)) return -2;
+        if(DataSecurity.containIllegalSymbols(newPass)) return -3;
+        try {
+            Statement stmt=con.createStatement();
+            PreparedStatement ps;
+            if(permission=="emp") {
+                 ps = con.prepareStatement(SELECT_LOGIN_EMP);
+            }else  ps = con.prepareStatement(SELECT_LOGIN_USER);
+
+            ps.setString(1, nickname);
+            ResultSet rs= ps.executeQuery();
+            if (rs.next() == false) {
+                return -2;
+            }
+            haslo = rs.getString("haslo");
+            salt = haslo.split(":")[1];
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if(DataSecurity.checkPasswords(oldPass,salt, haslo)) {
+            try {
+                Statement stmt=con.createStatement();
+                PreparedStatement ps;
+                if(permission=="emp") ps = con.prepareStatement(UPDATE_PASSWORD_EMP);
+                else ps = con.prepareStatement(UPDATE_PASSWORD_USER);
+
+                ps.setString(1, DataSecurity.getHashSHA512(newPass,DataSecurity.getSalt()));
+                ps.setString(2, nickname);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return -1;
+    }
 
 }
  class Pair<L,R> {
