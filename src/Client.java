@@ -33,6 +33,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         // option dialog dla rejestracji : login haslo adres, imie nazwisko, numer telefonu, mail
         host = JOptionPane.showInputDialog("Podaj adres serwera");
         name = JOptionPane.showInputDialog("Podaj nazwe klienta");
+
         if (name != null && !name.equals("")) {
             new Client(name, host);
         }

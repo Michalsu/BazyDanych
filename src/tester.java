@@ -12,9 +12,8 @@ public class tester {
                 "jdbc:mysql://127.0.0.1:3306/baza","root","root");
 
 
-        String req = "SEARCH#1";
-        Request.parseRequest(req, con);
-     //   new Client("c1","localhost");
+     //   Request.parseRequest(req, con);
+        new Client("c1","localhost");
      //   new Client("c2","localhost");
         //Request.addOutpost(con,10000, 54321, "Granatowa",22,"Prowizoryczna");
         //Request.addEmployee(con, "p252818", "A!2345678","Michał","Sujewicz",123456789,"ms@poczta.pl",12345,"Poziomkowa",12,1,"admin");
@@ -64,9 +63,25 @@ public class tester {
         System.out.println(DataSecurity.checkPasswords("Password",salt.toString(),hashedPass));
 
 
-         */
 
 
+
+for(int i = 1;i<500;i++){
+    StringBuilder sb = new StringBuilder();
+    String haslo = "haslo!" + i;
+            sb.append("Update klient set haslo = '" + DataSecurity.getHashSHA512(haslo,DataSecurity.getSalt()) +
+                    "' where klient_ID = " + i);
+
+            String q = sb.toString();
+
+
+    try {
+        Statement stmt = con.createStatement();
+        int rs = stmt.executeUpdate(q);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}*/
 
 
 
