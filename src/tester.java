@@ -13,7 +13,7 @@ public class tester {
 
 
         String req = "SEARCH#";
-        Request.parseRequest(req, con);
+     //   Request.parseRequest(req, con);
      //   new Client("c1","localhost");
      //   new Client("c2","localhost");
         //Request.addOutpost(con,10000, 54321, "Granatowa",22,"Prowizoryczna");
@@ -25,7 +25,9 @@ public class tester {
 
         //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);
        // System.out.println(register);
-    //   Request.parseRequest("ADDTOCART#Login5#1#5", con);
+  // Request.parseRequest("ADDTOCART#Login1#1#5", con);
+     //   Request.parseRequest("ADDTOCART#Login1#2#5", con);
+     //   Request.parseRequest("ADDTOCART#Login1#3#5", con);
     // Request.parseRequest("ADDTOCART#Adamnowak#2#2", con);
     //   Request.parseRequest("ADDTOCART#Adamnowak#1#2", con);
     //    Request.parseRequest("ADDTOCART#Adam#2#2", con);
@@ -34,9 +36,9 @@ public class tester {
         //    Request.parseRequest("ADDTOCART#adam#2#3", con);
        // Request.parseRequest("ADDTOCART#Adam#1#5", con);
   //Request.parseRequest("ADDPRODUCTTOMAGAZINE#2#3#2", con);
-        // Request.parseRequest("CHANGEPRODUCT#1#1000#1#dasda#dsadas#1", con);
-      //       Request.parseRequest("DELETEFROMCART#Adamnowak#2", con);
-  //  Request.parseRequest("BUY#Login5#gotowe#karta#dodomu", con);
+        // Request.parseRequest("CHANGEPRODUCT#2#1000#1#dasda#dsadas#1", con);
+    //   Request.parseRequest("DELETEFROMCART#Login1#3", con);
+  //  Request.parseRequest("BUY#Login1#gotowe#karta#dodomu", con);
     //  Request.parseRequest("LOGOUT", con);
 
 

@@ -180,29 +180,6 @@ class ClientThread implements Runnable {
             throwables.printStackTrace();
         }
 
-      /*  try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-       */
-        System.out.println("test1");
-        String produkt= "mle";
-        try {
-
-            System.out.println("test2");
-            Statement stmt= Server.con.createStatement();
-            System.out.println("test3");
-            //ResultSet rs=stmt.executeQuery("SELECT produkt_ID, Cena FROM produkt WHERE nazwa LIKE '%"+ produkt+"%';");
-            ResultSet rs = stmt.executeQuery("SELECT * FROM produkt;");
-            System.out.println("test4");
-            System.out.println(rs.getInt(1)+"  "+rs.getInt(2)+
-                    "  "+rs.getInt(3)+"  "+rs.getString(4)+"  "+rs.getString(5)+"  "+rs.getInt(6));
-            System.out.println("test5");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
 
 
@@ -231,16 +208,12 @@ class ClientThread implements Runnable {
                     socket.close();
                     socket=null;
                 }
-                else if (actualValue[0].equals("buy1")&& actualValue.length==1)
+                else
                 {
-                     Request.parseRequest("BUY#Adamnowak#gotowe#karta#dodomu", con);
+                     Request.parseRequest(actualValue[0], con);
 
                 }
-                else if (actualValue[0].equals("buy")&& actualValue.length==1)
-                {
-                    Request.parseRequest("BUY#Adam#gotowe#karta#dodomu", con);
 
-                }
             }
 
         }
