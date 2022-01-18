@@ -1,5 +1,4 @@
 import java.sql.*;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,18 +18,21 @@ public class Request {
     private static final String UPDATE_PASSWORD_USER = "UPDATE klient SET haslo = ? WHERE login = ?";
 
     public static String parseRequest(String request, Connection con){
-        if(request == "")return "ERROR";
+        if(request == "")return "ERROR NO REQUEST";
+        //if(DataSecurity.containIllegalSymbols(request)) return "ERROR ILLEGAL SYMBOL";
+        request= DataSecurity.sanitizeInput(request);
         String[] substrings = request.split("#");
         int parimeters=substrings.length;
         int exCode=-1;
         String response ="ERROR";
         switch(substrings[0]){
             case "LOGINUSER":
+
                 exCode=login(con, substrings[1],substrings[2],"user");
                 if(exCode==0) response = "LOGIN#SUCCESSFUL";
                 else if(exCode==-1) response = "LOGIN#WRONGPASS";
                 else if(exCode==-2) response = "LOGIN#WRONGNAME";
-                else response = "LOGIN#ERROR";
+                else response = "LOGIN#ERROR"+exCode;
                 break;
             case "LOGINEMP":
                 exCode=login(con, substrings[1],substrings[2],"emp");
@@ -38,7 +40,7 @@ public class Request {
                 else if(exCode==-1) response = "LOGIN#WRONGPASS";
                 else if(exCode==-2) response = "LOGIN#WRONGNAME";
                 else if(exCode==1) response = "LOGIN#OLDPASS";
-                else response = "LOGIN#ERROR";
+                else response = "LOGIN#ERROR"+exCode;
                 break;
             case "SEARCH":
                 StringBuilder sb = new StringBuilder();
@@ -71,7 +73,7 @@ public class Request {
                     }
                     ab.insert(0,"SEARCH#"+i+"#");
                     response= ab.toString();
-                    System.out.println(response);
+                   // System.out.println(response);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -601,18 +603,26 @@ public class Request {
                     exCode = addEmployee(con,substrings[1],substrings[2],substrings[3],substrings[4],
                             Integer.parseInt(substrings[5]),substrings[6],Integer.parseInt(substrings[6]),
                             substrings[7],Integer.parseInt(substrings[8]),Integer.parseInt(substrings[9]),substrings[10]);
+                    if(exCode==0) response="OK";
+                    else response="ERROR"+exCode;
                 break;
             case "ADDOUTPOST":
-                    exCode = addOutpost(con,Integer.parseInt(substrings[1]),Integer.parseInt(substrings[2]),
+                exCode = addOutpost(con,Integer.parseInt(substrings[1]),Integer.parseInt(substrings[2]),
                             substrings[3],Integer.parseInt(substrings[4]),substrings[5]);
+                if(exCode==0) response="OK";
+                else response="ERROR"+exCode;
                 break;
 
             case "CHANGEPASSEMP":
-                changePassword(con, substrings[1], substrings[2], substrings[3], "emp");
+                exCode = changePassword(con, substrings[1], substrings[2], substrings[3], "emp");
+                if(exCode==0) response="OK";
+                else response="ERROR"+exCode;
                 break;
 
-            case "CGANGEPASSUSER":
-                changePassword(con, substrings[1], substrings[2], substrings[3],"user");
+            case "CHANGEPASSUSER":
+                exCode = changePassword(con, substrings[1], substrings[2], substrings[3],"user");
+                if(exCode==0) response="OK";
+                else response="ERROR"+exCode;
                 break;
         }
         return response;

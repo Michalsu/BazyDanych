@@ -18,8 +18,11 @@ public class tester {
         //Request.addOutpost(con,10000, 54321, "Granatowa",22,"Prowizoryczna");
        // Request.addEmployee(con, "LoginPracownik31", "A!2345678","Imie31","Nazwisko31",123456789,"nazwiskoimie@poczta.pl",12345,"Poziomkowa",12,1,"sprzedawca");
         //Request.setPassword(con, "Login1", "haslo!1","user");
-        System.out.println(Request.login(con, "LoginPracownik31", "A!2345678", "emp"));
-        System.out.println(Request.login(con, "Login1", "haslo!1","user"));
+
+
+        System.out.println(Request.parseRequest("SEARCH#123'; Drop table klient -- ",con));
+        System.out.println(Request.parseRequest("LOGINEMP#LoginPracownik31#A!2345678",con));
+        System.out.println(Request.parseRequest("LOGINUSER#Login1#haslo!1",con));
         //stmt.executeUpdate("INSERT INTO `dane osobowe`(adres_id, Imie,Nazwisko,nr_telefonu,mail) VALUES (1, 'Adam', 'Nowak' ,1243 ,'adaaa@bat.pl')");
 
         //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);
@@ -45,24 +48,6 @@ public class tester {
 
 
 /*
-        String salt = DataSecurity.getSalt();
-        String hashedPass = DataSecurity.getHashSHA512("Password", salt);
-
-        System.out.println(" salt -> " + salt);
-        System.out.println(" hash -> " + hashedPass);
-
-
-        System.out.println(Request.login(con,"Adamnowak","A!23456789"));
-        System.out.println(Request.login(con,"Adamnowak","A!23456788"));
-        System.out.println(Request.login(con,"Adaadfa11mNdswa","A!23456789"));
-        System.out.println(Request.login(con,"Adamnowk","A!23456789"));
-
-
-
-
-
-
-
 
 
 for(int i = 1;i<500;i++){
