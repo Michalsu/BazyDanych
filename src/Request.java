@@ -386,8 +386,6 @@ public class Request {
                 break;
             case "ADDPRODUCTTOMAGAZINE":
 
-
-
                 boolean ifExist = false;
                 sb = new StringBuilder();
                 sb.append("SELECT liczba_produktow FROM magazyn_produkt where magazyn_ID = " + substrings[1] +
@@ -452,10 +450,87 @@ public class Request {
                 updateStorageSpace(Integer.parseInt(substrings[1]),con);
                 }
                 break;
+            case "DELETEPRODUCT":
+
+                sb = new StringBuilder();
+
+                sb.append("START TRANSACTION");
+                query=sb.toString();
+                try {
+                    Statement stmt=con.createStatement();
+                    ResultSet rs = stmt.executeQuery(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                List<Integer> clients = new ArrayList<Integer>();
+                sb = new StringBuilder();
+                sb.append("SELECT koszyk_ID from koszyk;");
+                query=sb.toString();
+                try {
+                    Statement stmt=con.createStatement();
+                    ResultSet rs = stmt.executeQuery(query);
+
+                    while(rs.next())
+                        clients.add(rs.getInt(1));
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                for(int i = 0; i<clients.size();i++)
+                    deleteFromCart(Integer.parseInt(substrings[1]), clients.get(i), con);
+
+                for(int i = 0; i<clients.size();i++)
+                    updatePrice(clients.get(i), con);
+
+
+                sb = new StringBuilder();
+                sb.append("Update magazyn_produkt set liczba_produktow = '0' where produkt_ID = " + substrings[1]+";");
+                query = sb.toString();
+                try {
+                    Statement stmt = con.createStatement();
+                    int rs = stmt.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+
+                sb = new StringBuilder();
+                sb.append("SELECT magazyn_ID from magazyn;");
+                query = sb.toString();
+                try {
+                    Statement stmt = con.createStatement();
+                    ResultSet rs = stmt.executeQuery(query);
+                    while (rs.next())
+                        updateStorageSpace(rs.getInt(1), con);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+
+                sb = new StringBuilder();
+                sb.append("DELETE FROM produkt where produkt_ID = " + substrings[1]+";");
+                query = sb.toString();
+                try {
+                    Statement stmt = con.createStatement();
+                    int rs = stmt.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                sb = new StringBuilder();
+                sb.append("COMMIT;");
+                query=sb.toString();
+                try {
+                    Statement stmt=con.createStatement();
+                    ResultSet rs = stmt.executeQuery(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
             case "CHANGEPRODUCT":
 
                 sb = new StringBuilder();
-                List<Integer> clients = new ArrayList<Integer>();
+              clients = new ArrayList<Integer>();
                 sb.append("START TRANSACTION");
                 query=sb.toString();
                 try {
@@ -684,7 +759,6 @@ else {
 
         String produkty = null;
         float wartosc_koszyka =0;
-
         try {
 
             Statement stmt=con.createStatement();
@@ -696,29 +770,21 @@ else {
         }
 
 
-        if(produkty == null || produkty.equals("[]"))
-            produkty = "[]";
-        else
-            produkty = "[" + produkty + "]";
+        if(produkty!=null) {
+            String[] items = produkty.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
 
 
+            int[] products = new int[items.length];
 
-        if(produkty.length()-2==0) {
-            wartosc_koszyka = 0;
-            sb.setLength(0);
-            sb.append("UPDATE koszyk SET wartosc_koszyka = " + wartosc_koszyka + "WHERE (koszyk_ID =" + koszyk_id + " );");
-            query = sb.toString();
-            try {
-                Statement stmt = con.createStatement();
-                int rs = stmt.executeUpdate(query);
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-
-
+            for (int i = 0; i < items.length; i++) {
+                try {
+                    products[i] = Integer.parseInt(items[i]);
+                } catch (NumberFormatException nfe) {
+                }
             }
-        }
-       else if(produkty.length()-2==1)
+
+
+        if(produkty.length()==1)
         {
 
             sb.setLength(0);
@@ -770,12 +836,9 @@ else {
 
 
             }}
-        else if( produkty.length()-2>1)
+        else if( produkty.length()>1)
         {
 
-            String[] items = produkty.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
-
-            int[] products = new int[items.length];
 
             for (int i = 0; i < items.length; i++) {
                 try {
@@ -804,6 +867,7 @@ else {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+
                  int productc_count = 0;
                 sb.setLength(0);
                 sb.append("SELECT liczba_sztuk FROM koszyk_produkt WHERE produkt_id = " +products[i] +
@@ -820,8 +884,8 @@ else {
                     e.printStackTrace();
                 }
 
+                wartosc_koszyka = wartosc_koszyka +  productc_count * cena * ((100 - promocja)/100);
 
-                wartosc_koszyka = wartosc_koszyka +  productc_count * cena * ((100 - promocja/100));
             }
             sb.setLength(0);
             sb.append("UPDATE koszyk SET wartosc_koszyka = "+ wartosc_koszyka +  "WHERE (koszyk_ID =" + koszyk_id + " );");
@@ -833,6 +897,21 @@ else {
 
             } catch (SQLException e) {
                 e.printStackTrace();
+            }
+        }}else
+        {
+            wartosc_koszyka = 0;
+            sb.setLength(0);
+            sb.append("UPDATE koszyk SET wartosc_koszyka = " + wartosc_koszyka + "WHERE (koszyk_ID =" + koszyk_id + " );");
+            query = sb.toString();
+            try {
+                Statement stmt = con.createStatement();
+                int rs = stmt.executeUpdate(query);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+
+
             }
         }
     }
@@ -921,7 +1000,7 @@ else {
       StringBuilder  sb =  new StringBuilder();
 
         String  query=sb.toString();
-        sb.setLength(0);
+       sb.setLength(0);
         sb.append("SELECT JSON_EXTRACT(produkt_list, \"$.produkty\") FROM koszyk where koszyk_ID = "+ koszyk_id);
         query=sb.toString();
         String produkty = null;
@@ -935,68 +1014,75 @@ else {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        String[] items = produkty.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
-
-        int[] products = new int[items.length];
-
-        for (int i = 0; i < items.length; i++) {
-            try {
-                products[i] = Integer.parseInt(items[i]);
-            } catch (NumberFormatException nfe) {
-            }};
-
-        boolean contains = false;
-        for(int i =0 ;i<products.length;i++)
-                if(products[i] == produkt_id)
-                    contains=true;
-
-          if(contains) {
-              if (products.length == 1) {
-
-                  sb.setLength(0);
-                  sb.append("update koszyk set produkt_list = '[]' where koszyk_ID =" + koszyk_id);
-                  query = sb.toString();
-                  try {
-                      Statement stmt = con.createStatement();
-                      int rs = stmt.executeUpdate(query);
-                  } catch (SQLException e) {
-                      e.printStackTrace();
-                  }
-
-              } else if (products.length > 1) {
-                  //  int[] products = Arrays.stream(produkty.substring(1, produkty.length() - 1).split(","))
-                  //  .map(String::trim).mapToInt(Integer::parseInt).toArray();
 
 
-                  int index = 0;
-                  for (int i = 0; i < products.length; i++) {
-                      if (products[i] == produkt_id)
-                          index = i;
-                  }
-                  sb.setLength(0);
-                  sb.append("update koszyk set produkt_list = JSON_REMOVE(produkt_list, '$.produkty[" + index
-                          + "]') where koszyk_ID =" + koszyk_id);
-                  query = sb.toString();
-                  try {
-                      Statement stmt = con.createStatement();
-                      int rs = stmt.executeUpdate(query);
-                  } catch (SQLException e) {
-                      e.printStackTrace();
-                  }
-              }
-              updatePrice(koszyk_id, con);
+        if(produkty!=null) {
+            String[] items = produkty.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
 
-              sb.setLength(0);
-              sb.append("DELETE FROM koszyk_produkt WHERE koszyk_ID = " + koszyk_id +
-                      " and produkt_id = " + produkt_id);
-              query = sb.toString();
-              try {
-                  Statement stmt = con.createStatement();
-                  int rs = stmt.executeUpdate(query);
-              } catch (SQLException e) {
-                  e.printStackTrace();
-              }
-          }
+
+            int[] products = new int[items.length];
+
+            for (int i = 0; i < items.length; i++) {
+                try {
+                    products[i] = Integer.parseInt(items[i]);
+                } catch (NumberFormatException nfe) {
+                }
+            }
+
+
+            boolean contains = false;
+            for (int i = 0; i < products.length; i++)
+                if (products[i] == produkt_id)
+                    contains = true;
+
+            if (contains) {
+                if (products.length == 1) {
+
+                    sb.setLength(0);
+                    sb.append("update koszyk set produkt_list = '[]' where koszyk_ID =" + koszyk_id);
+                    query = sb.toString();
+                    try {
+                        Statement stmt = con.createStatement();
+                        int rs = stmt.executeUpdate(query);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                } else if (products.length > 1) {
+                    //  int[] products = Arrays.stream(produkty.substring(1, produkty.length() - 1).split(","))
+                    //  .map(String::trim).mapToInt(Integer::parseInt).toArray();
+
+
+                    int index = 0;
+                    for (int i = 0; i < products.length; i++) {
+                        if (products[i] == produkt_id)
+                            index = i;
+                    }
+                    sb.setLength(0);
+                    sb.append("update koszyk set produkt_list = JSON_REMOVE(produkt_list, '$.produkty[" + index
+                            + "]') where koszyk_ID =" + koszyk_id);
+                    query = sb.toString();
+                    try {
+                        Statement stmt = con.createStatement();
+                        int rs = stmt.executeUpdate(query);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+                updatePrice(koszyk_id, con);
+
+                sb.setLength(0);
+                sb.append("DELETE FROM koszyk_produkt WHERE koszyk_ID = " + koszyk_id +
+                        " and produkt_id = " + produkt_id);
+                query = sb.toString();
+                try {
+                    Statement stmt = con.createStatement();
+                    int rs = stmt.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
     }
     private static int logout(){
