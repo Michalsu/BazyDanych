@@ -17,9 +17,9 @@ public class tester {
      //   new Client("c2","localhost");
         //Request.addOutpost(con,10000, 54321, "Granatowa",22,"Prowizoryczna");
        // Request.addEmployee(con, "LoginPracownik31", "A!2345678","Imie31","Nazwisko31",123456789,"nazwiskoimie@poczta.pl",12345,"Poziomkowa",12,1,"sprzedawca");
-
-
-        Request.login(con, "LoginPracownik31", "A!2345678", "emp");
+        //Request.setPassword(con, "Login1", "haslo!1","user");
+        System.out.println(Request.login(con, "LoginPracownik31", "A!2345678", "emp"));
+        System.out.println(Request.login(con, "Login1", "haslo!1","user"));
         //stmt.executeUpdate("INSERT INTO `dane osobowe`(adres_id, Imie,Nazwisko,nr_telefonu,mail) VALUES (1, 'Adam', 'Nowak' ,1243 ,'adaaa@bat.pl')");
 
         //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);

@@ -1139,7 +1139,7 @@ else {
             }
             haslo = rs.getString("haslo");
             salt = haslo.split(":")[1];
-            baseDate = rs.getDate("zmianahasla");
+            if(permission=="emp") baseDate = rs.getDate("zmianahasla");
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1315,7 +1315,7 @@ else {
 
         return -1;
     }
-    private static int setPassword(Connection con, String nickname, String newPass, String permission){
+    public static int setPassword(Connection con, String nickname, String newPass, String permission){
         try {
             Statement stmt=con.createStatement();
             PreparedStatement ps;
