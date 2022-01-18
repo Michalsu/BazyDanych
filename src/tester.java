@@ -12,17 +12,54 @@ public class tester {
                 "jdbc:mysql://127.0.0.1:3306/baza","root","root");
 
 
-     //   Request.parseRequest(req, con);
-       // new Client("c1","localhost");
-     //   new Client("c2","localhost");
+
+      //  System.out.println(Request.parseRequest("SEARCH#12",con));
+    //    System.out.println(Request.parseRequest("SEARCH#123'; Drop table klient -- ",con));
+     //   System.out.println(Request.parseRequest("LOGINEMP#LoginPracownik31#A!2345678",con));
+     //   System.out.println(Request.parseRequest("LOGINUSER#Login1#haslo!1",con));
+     //   Request.parseRequest("REGISTER#NowyKlient#Haslo!123#Michal#Sujewicz#123857693#abc@mail.com#12354#Grzybowa#7",con);
+      //  System.out.println(Request.parseRequest("LOGINUSER#NowyKlient#Haslo!122",con));
+      //  System.out.println(Request.parseRequest("LOGINUSER#NowyKlient#Haslo!123",con));
+     //   System.out.println(Request.parseRequest("CHANGEPASSUSER#NowyKlient#Haslo!123#Haslo!122",con));
+     //   System.out.println(Request.parseRequest("LOGINUSER#NowyKlient#Haslo!122",con));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //   Request.parseRequest(req, con);
+        // new Client("c1","localhost");
+        //   new Client("c2","localhost");
         //Request.addOutpost(con,10000, 54321, "Granatowa",22,"Prowizoryczna");
-       // Request.addEmployee(con, "LoginPracownik31", "A!2345678","Imie31","Nazwisko31",123456789,"nazwiskoimie@poczta.pl",12345,"Poziomkowa",12,1,"sprzedawca");
+        // Request.addEmployee(con, "LoginPracownik32", "A!2345678","Imie32","Nazwisko32",123456781,"nazoimie@poczta.pl",12345,"Poziowa",123,1,"sprzedawca");
         //Request.setPassword(con, "Login1", "haslo!1","user");
 
 
-        System.out.println(Request.parseRequest("SEARCH#123'; Drop table klient -- ",con));
-        System.out.println(Request.parseRequest("LOGINEMP#LoginPracownik31#A!2345678",con));
-        System.out.println(Request.parseRequest("LOGINUSER#Login1#haslo!1",con));
         //stmt.executeUpdate("INSERT INTO `dane osobowe`(adres_id, Imie,Nazwisko,nr_telefonu,mail) VALUES (1, 'Adam', 'Nowak' ,1243 ,'adaaa@bat.pl')");
 
         //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);

@@ -1365,6 +1365,7 @@ else {
         }
         if(DataSecurity.checkPasswords(oldPass,salt, haslo)) {
             setPassword(con, nickname, newPass, permission);
+            return 0;
         }
         return -1;
     }
