@@ -16,10 +16,10 @@ public class tester {
        // new Client("c1","localhost");
      //   new Client("c2","localhost");
         //Request.addOutpost(con,10000, 54321, "Granatowa",22,"Prowizoryczna");
-        //Request.addEmployee(con, "p252818", "A!2345678","Michał","Sujewicz",123456789,"ms@poczta.pl",12345,"Poziomkowa",12,1,"admin");
+       // Request.addEmployee(con, "LoginPracownik31", "A!2345678","Imie31","Nazwisko31",123456789,"nazwiskoimie@poczta.pl",12345,"Poziomkowa",12,1,"sprzedawca");
 
 
-
+        Request.login(con, "LoginPracownik31", "A!2345678", "emp");
         //stmt.executeUpdate("INSERT INTO `dane osobowe`(adres_id, Imie,Nazwisko,nr_telefonu,mail) VALUES (1, 'Adam', 'Nowak' ,1243 ,'adaaa@bat.pl')");
 
         //int register = Request.register(con, "Adamnowak", "A!23456789", "Adam", "Nowak", 321, "abat@gail.com", 10120, "Kasztanowa", 11);
@@ -40,7 +40,7 @@ public class tester {
       //  Request.parseRequest("CHANGEPRODUCT#15#1#0#dasda#dsadas#1", con);
 //Request.parseRequest("DELETEFROMCART#Login1#16", con);
       //  Request.parseRequest("DELETEFROMCART#Login1#4", con);
-    Request.parseRequest("BUY#Login1#gotowe#karta#dodomu", con);
+   // Request.parseRequest("BUY#Login1#gotowe#karta#dodomu", con);
       //Request.parseRequest("DELETEPRODUCT#2", con);
 
 
@@ -59,11 +59,7 @@ public class tester {
 
 
 
-        System.out.println(DataSecurity.checkPasswords("password",salt.toString(),hashedPass));
-        System.out.println(DataSecurity.checkPasswords("Password",salt.toString(),hashedPass));
-        System.out.println(DataSecurity.checkPasswords("Password",salt.toString(),hashedPass));
-        System.out.println(DataSecurity.checkPasswords("blababla",salt.toString(),hashedPass));
-        System.out.println(DataSecurity.checkPasswords("Password",salt.toString(),hashedPass));
+
 
 
 

@@ -187,7 +187,7 @@ class ClientThread implements Runnable {
              text = "Wpisz hasło";
             output.writeObject(text);
             password = (String)input.readObject();
-            switch(Request.login(con,login,password))
+            switch(Request.login(con,login,password, "user"))
             {
                 case 0:
                     text = "Zalogowano";

@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -11,10 +12,10 @@ public class Request {
     private static final String INSERT_ADRES = "INSERT INTO adres(kod_pocztowy, ulica, numer) VALUES (?,?,?)";
     private static final String INSERT_MAGAZYN = "INSERT INTO magazyn(przestrzen_magazynowa, maksymalna_przestrzen_magazynowa) VALUES (?, ?)";
     private static final String INSERT_PLACOWKA = "INSERT INTO placowka(adres_id, magazyn_ID, nazwa) VALUES (?,?,?)";
-    private static final String INSERT_EMPLOYEE = "INSERT INTO pracownik(dane_osobowe_ID, placowka_id, login, haslo, funkcja) VALUES (?,?,?,?,?)";
+    private static final String INSERT_EMPLOYEE = "INSERT INTO pracownik(dane_osobowe_ID, placowka_id, login, haslo, funkcja, zmianahasla) VALUES (?,?,?,?,?,?)";
     private static final String SELECT_LOGIN_USER = "SELECT login, haslo FROM klient WHERE login = ?";
-    private static final String SELECT_LOGIN_EMP = "SELECT login, haslo FROM pracownik WHERE login = ?";
-    private static final String UPDATE_PASSWORD_EMP = "UPDATE pracownik SET haslo = ? WHERE login = ?";
+    private static final String SELECT_LOGIN_EMP = "SELECT login, haslo, zmianahasla FROM pracownik WHERE login = ?";
+    private static final String UPDATE_PASSWORD_EMP = "UPDATE pracownik SET haslo = ?, zmianahasla = ? WHERE login = ?";
     private static final String UPDATE_PASSWORD_USER = "UPDATE klient SET haslo = ? WHERE login = ?";
 
     public static String parseRequest(String request, Connection con){
@@ -24,11 +25,19 @@ public class Request {
         int exCode=-1;
         String response ="ERROR";
         switch(substrings[0]){
-            case "LOGIN":
-                exCode=login(con, substrings[1],substrings[2]);
+            case "LOGINUSER":
+                exCode=login(con, substrings[1],substrings[2],"user");
                 if(exCode==0) response = "LOGIN#SUCCESSFUL";
                 else if(exCode==-1) response = "LOGIN#WRONGPASS";
                 else if(exCode==-2) response = "LOGIN#WRONGNAME";
+                else response = "LOGIN#ERROR";
+                break;
+            case "LOGINEMP":
+                exCode=login(con, substrings[1],substrings[2],"emp");
+                if(exCode==0) response = "LOGIN#SUCCESSFUL";
+                else if(exCode==-1) response = "LOGIN#WRONGPASS";
+                else if(exCode==-2) response = "LOGIN#WRONGNAME";
+                else if(exCode==1) response = "LOGIN#OLDPASS";
                 else response = "LOGIN#ERROR";
                 break;
             case "SEARCH":
@@ -597,10 +606,22 @@ public class Request {
                     exCode = addOutpost(con,Integer.parseInt(substrings[1]),Integer.parseInt(substrings[2]),
                             substrings[3],Integer.parseInt(substrings[4]),substrings[5]);
                 break;
+
+            case "CHANGEPASSEMP":
+                changePassword(con, substrings[1], substrings[2], substrings[3], "emp");
+                break;
+
+            case "CGANGEPASSUSER":
+                changePassword(con, substrings[1], substrings[2], substrings[3],"user");
+                break;
         }
         return response;
     }
 
+    public static int changeEmpPass(Connection con){
+
+        return -1;
+    }
     private static List<Pair<Integer,Integer>> getProductsFromCart(int koszyk_id,  Connection con)
     {
 
@@ -1098,16 +1119,19 @@ else {
      * @param con connection
      * @param nickname of the user trying to login
      * @param password to check
-     * @return 0 - password correct, -1 - password incorrect, -2 nickname dont exists
+     * @return 0 - password correct, -1 - password incorrect, -2 nickname dont exists, 1 password is old
      *
      */
-    public static int login(Connection con, String nickname, String password){
+    public static int login(Connection con, String nickname, String password, String permission){
         String salt = null;
         String haslo = null;
+        java.sql.Date baseDate=new java.sql.Date(new java.util.Date().getTime());
         if(DataSecurity.containIllegalSymbols(nickname)) return -2;
         try {
             Statement stmt=con.createStatement();
-            PreparedStatement ps = con.prepareStatement(SELECT_LOGIN_USER);
+            PreparedStatement ps;
+            if(permission=="emp") ps = con.prepareStatement(SELECT_LOGIN_EMP);
+                else ps = con.prepareStatement(SELECT_LOGIN_USER);
             ps.setString(1, nickname);
             ResultSet rs= ps.executeQuery();
             if (rs.next() == false) {
@@ -1115,10 +1139,24 @@ else {
             }
             haslo = rs.getString("haslo");
             salt = haslo.split(":")[1];
+            baseDate = rs.getDate("zmianahasla");
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if(DataSecurity.checkPasswords(password,salt, haslo)) return 0;
+        if(DataSecurity.checkPasswords(password,salt, haslo)){
+            if(permission=="emp"){
+                Calendar c = Calendar.getInstance();
+                c.setTime(new java.sql.Date(new java.util.Date().getTime()));
+                c.add(Calendar.DATE, -180); //pol roku
+                java.sql.Date date = new Date(c.getTimeInMillis());
+                if(baseDate.before(date)){
+                    return 1;
+                }
+            }
+            return 0;
+        }
+
         return -1;
     }
 
@@ -1256,12 +1294,15 @@ else {
                 rs.next();
                 int daneosid= rs.getInt(1);
 
+                String date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+
                 ps=con.prepareStatement(INSERT_EMPLOYEE);
                 ps.setInt(1,daneosid);
                 ps.setInt(2,placowka);
                 ps.setString(3,logi);
                 ps.setString(4,DataSecurity.getHashSHA512(haslo,DataSecurity.getSalt()));
                 ps.setString(5, funkcja);
+                ps.setString(6, date);
                 ps.executeUpdate();
 
                 return 0;
@@ -1274,7 +1315,22 @@ else {
 
         return -1;
     }
+    private static int setPassword(Connection con, String nickname, String newPass, String permission){
+        try {
+            Statement stmt=con.createStatement();
+            PreparedStatement ps;
+            if(permission=="emp") ps = con.prepareStatement(UPDATE_PASSWORD_EMP);
+            else ps = con.prepareStatement(UPDATE_PASSWORD_USER);
 
+            ps.setString(1, DataSecurity.getHashSHA512(newPass,DataSecurity.getSalt()));
+            ps.setString(2, nickname);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+        return 0;
+    }
     public static int changePassword(Connection con, String nickname, String oldPass, String newPass, String permission){
         String salt = null;
         String haslo = null;
@@ -1298,18 +1354,7 @@ else {
             e.printStackTrace();
         }
         if(DataSecurity.checkPasswords(oldPass,salt, haslo)) {
-            try {
-                Statement stmt=con.createStatement();
-                PreparedStatement ps;
-                if(permission=="emp") ps = con.prepareStatement(UPDATE_PASSWORD_EMP);
-                else ps = con.prepareStatement(UPDATE_PASSWORD_USER);
-
-                ps.setString(1, DataSecurity.getHashSHA512(newPass,DataSecurity.getSalt()));
-                ps.setString(2, nickname);
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            setPassword(con, nickname, newPass, permission);
         }
         return -1;
     }
