@@ -123,7 +123,7 @@ class ClientThread implements Runnable {
     private Server myServer;
     private String login;
     private String password;
-
+    private String type;
 
     private ObjectOutputStream outputStream = null;
 
@@ -180,13 +180,18 @@ class ClientThread implements Runnable {
             String text;
             outputStream = output;
             name = (String)input.readObject();
-            while(!ifDataCorrect) {
+            type =  (String)input.readObject();
+            System.out.println(type);
+            /*while(!ifDataCorrect) {
                  text = "Wpisz login";
                 output.writeObject(text);
                 login = (String)input.readObject();
+
+                System.out.println(login);
              text = "Wpisz hasło";
             output.writeObject(text);
             password = (String)input.readObject();
+            System.out.println(password);
             switch(Request.login(con,login,password, "user"))
             {
                 case 0:
@@ -211,7 +216,7 @@ class ClientThread implements Runnable {
 
             }
 
-
+*/
 
             while(true){
                 message = (String)input.readObject();

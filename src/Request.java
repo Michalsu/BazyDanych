@@ -179,7 +179,6 @@ public class Request {
                 deleteFromCart(Integer.parseInt(substrings[2]),koszyk_id,con);
                 break;
             case "BUY":
-
                 boolean ifEmpty = false;
 
 
@@ -819,7 +818,7 @@ else {
         {
 
             sb.setLength(0);
-            sb.append("SELECT cena, Promocja FROM produkt WHERE produkt_id = " + produkty.charAt(1) + ";");
+            sb.append("SELECT cena, Promocja FROM produkt WHERE produkt_id = " + products[0] + ";");
             query=sb.toString();
 
             float cena = 0;
@@ -837,7 +836,7 @@ else {
             }
             int productc_count = 0;
             sb.setLength(0);
-            sb.append("SELECT liczba_sztuk FROM koszyk_produkt WHERE produkt_id = " +produkty.charAt(1)+
+            sb.append("SELECT liczba_sztuk FROM koszyk_produkt WHERE produkt_id = " +products[0]+
                     " and koszyk_ID = "+ koszyk_id + ";");
             query=sb.toString();
 
