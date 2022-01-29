@@ -23,6 +23,7 @@ class Client extends JFrame implements ActionListener, Runnable{
     final static String LOGINPANEL = "Login layout";
     final static String REGISTERPANEL = "Register layout";
     final static String CLIENTPANEL = "Client panel layout";
+    final static String CARTPANEL = "Cart layout";
 
     private static boolean permission;
     JPanel cards; //a panel that uses CardLayout
@@ -244,6 +245,13 @@ class Client extends JFrame implements ActionListener, Runnable{
         JLabel countLabel = new JLabel("Ilość");
         JTextField countField = new JTextField();
 
+        //Panel użykownika
+
+        JButton viewCartButton = new JButton("Wyświetl koszyk");
+        JButton viewOrdersButton = new JButton("Wyświetl zamówienia");
+        JButton dataButton = new JButton("Wyświetl dane");
+        JButton logoutButton = new JButton("Wyloguj");
+
 
 
         JList categoryList =  new JList(vect);
@@ -278,6 +286,14 @@ class Client extends JFrame implements ActionListener, Runnable{
             }
 
         });
+        viewCartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,CARTPANEL);
+
+            }
+        });
 
 
        JScrollPane categoryScroll = new JScrollPane(categoryList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
@@ -288,11 +304,14 @@ class Client extends JFrame implements ActionListener, Runnable{
         categoryScroll.setBounds(10,40,150,vect.size()*10);
         itemsLabel.setBounds(180,10,80,30);
         itemScroll.setBounds(180,40,200,vect.size()*10);
-        itemsDescrition.setBounds(10,270,340,100);
+        itemsDescrition.setBounds(10,270,350,100);
         countLabel.setBounds(10,380,40,30);
         countField.setBounds(45,380,50,30);
         addToCartButton.setBounds(100,380, 200,30);
-
+        viewCartButton.setBounds(400,40, 130,30);
+        viewOrdersButton.setBounds(400,75, 130,30);
+        dataButton.setBounds(400,110, 130,30);
+        logoutButton.setBounds(400,145, 130,30);
 
         panelLayout.add(categoryLabel);
         panelLayout.add(itemsLabel);
@@ -302,9 +321,38 @@ class Client extends JFrame implements ActionListener, Runnable{
         panelLayout.add(countLabel);
         panelLayout.add(countField);
         panelLayout.add(addToCartButton);
-
+        panelLayout.add(viewCartButton);
+        panelLayout.add(viewOrdersButton);
+        panelLayout.add(dataButton);
+        panelLayout.add(logoutButton);
 
         panelLayout.setLayout(null);
+
+//Layout koszyka
+        JPanel cartLayout = new JPanel();
+        cartLayout.setLayout(null);
+
+//tutaj trzeba ściągnąć rzeczy w koszyku z bazy
+        Vector<Vector<String>> data = new Vector<>();
+       // data.addElement(new Vector<>("przedmiot1","1"));
+       // listOfItemsFromBase.addElement(new Pair<>("przedmiot2",2));
+
+        JButton backButton = new JButton("Powrót do sklepu");
+        JButton orderButton = new JButton("Zamów");
+        JLabel priceOfCart = new JLabel();
+
+        String[] columnNames = { "Przedmiot","Ilość" };
+
+      //  JTable itemsInCartList = new JTable(, columnNames);
+
+
+
+   //     JScrollPane cartScroll = new JScrollPane(itemsInCartList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+           //     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+
+
+    //    cartLayout.add(cartScroll);
 
 
 
@@ -315,6 +363,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         cards.add(loginLayout, LOGINPANEL);
         cards.add(RegisterLayout, REGISTERPANEL);
         cards.add(panelLayout,CLIENTPANEL);
+        cards.add(cartLayout,CARTPANEL);
         pane.add(cards, BorderLayout.CENTER);
 
 
