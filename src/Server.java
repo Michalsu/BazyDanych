@@ -181,6 +181,8 @@ class ClientThread implements Runnable {
             outputStream = output;
             name = (String)input.readObject();
 
+            System.out.println(name);
+
             myServer.addClient(this);
             output.writeObject("login");
 
@@ -222,16 +224,16 @@ class ClientThread implements Runnable {
 
             while(true){
                 message = (String)input.readObject();
-                String[] actualValue = message.split(" ");
+                String answ;
                 myServer.printReceivedMessage(this,message);
-                if (actualValue[0].equals("BYE")&& actualValue.length==1){
+                if (message.equals("BYE")){
                     myServer.removeClient(this);
                     input.close();
                     output.close();
                     socket.close();
                     socket=null;
                 }
-                else if (actualValue[0].equals("CLOSE")&& actualValue.length==1)
+                else if (message.equals("CLOSE"))
                 {
                     myServer.removeClient(this);
                     System.exit(0);
@@ -240,8 +242,10 @@ class ClientThread implements Runnable {
                 }
                 else
                 {
-                     Request.parseRequest(actualValue[0] , con);
 
+                     answ=Request.parseRequest(message , con);
+                     sendMessage(answ);
+                    System.out.println(answ);
                 }
 
             }

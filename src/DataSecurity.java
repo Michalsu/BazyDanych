@@ -92,7 +92,7 @@ public class DataSecurity {
      * @return true if contains illegal symbols, otherwise false
      */
     public static boolean containIllegalSymbols(String text){
-        Pattern special = Pattern.compile("[;\'\"\\[\\]{}/]");
+        Pattern special = Pattern.compile("[;\'\"\\[\\]{}/#]");
         Matcher m = special.matcher(text);
         return (m.find() || text.contains("--"));
     }

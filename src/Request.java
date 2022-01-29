@@ -27,12 +27,11 @@ public class Request {
         String response ="ERROR";
         switch(substrings[0]){
             case "LOGINUSER":
-
                 exCode=login(con, substrings[1],substrings[2],"user");
                 if(exCode==0) response = "LOGIN#SUCCESSFUL";
                 else if(exCode==-1) response = "LOGIN#WRONGPASS";
                 else if(exCode==-2) response = "LOGIN#WRONGNAME";
-                else response = "LOGIN#ERROR"+exCode;
+                else response = "LOGIN#ERROR: "+exCode;
                 break;
             case "LOGINEMP":
                 exCode=login(con, substrings[1],substrings[2],"emp");
@@ -40,7 +39,7 @@ public class Request {
                 else if(exCode==-1) response = "LOGIN#WRONGPASS";
                 else if(exCode==-2) response = "LOGIN#WRONGNAME";
                 else if(exCode==1) response = "LOGIN#OLDPASS";
-                else response = "LOGIN#ERROR"+exCode;
+                else response = "LOGIN#ERROR: "+exCode;
                 break;
             case "SEARCH":
                 StringBuilder sb = new StringBuilder();

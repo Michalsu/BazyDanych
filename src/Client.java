@@ -65,11 +65,30 @@ class Client extends JFrame implements ActionListener, Runnable{
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 //if(login.getText().isEmpty() || password.getText().isEmpty())
-                System.out.println(permission);
-                if(Client.permission == true)
-                {
-                    JOptionPane.showMessageDialog(null,"Nieprawidłowe dane");
+                boolean sendrequest=true;
+                if(DataSecurity.containIllegalSymbols(login.getText())){
+                   JOptionPane.showMessageDialog(null, "login zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #");
+                   sendrequest=false;
                 }
+                if(DataSecurity.containIllegalSymbols(password.getText())){
+                    JOptionPane.showMessageDialog(null, "hasło zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #");
+                    sendrequest=false;
+                }
+                if(!DataSecurity.passwordValid(password.getText())) {
+                    JOptionPane.showMessageDialog(null, "hasło nie spełnia minimalnych wymagan dlugość >=8, litery, cyfry, znaki specjalne");
+                    sendrequest=false;
+                }
+                StringBuilder sb = new StringBuilder();
+                sb.append("LOGINUSER#");
+                sb.append(login.getText()+ "#");
+                sb.append(password.getText());
+                sendMessage(sb.toString());
+
+                //System.out.println(permission);
+                //if(Client.permission == true)
+                //{
+                //    JOptionPane.showMessageDialog(null,"Nieprawidłowe dane");
+                //}
             }
         });
 
@@ -292,6 +311,15 @@ class Client extends JFrame implements ActionListener, Runnable{
         repaint();
     }
 
+    public void sendMessage(String message){
+        try {
+            outputStream.writeObject(message);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void run(){
         if (serverHost.equals("")) {
             // po��cz z lokalnym komputerem
@@ -312,16 +340,34 @@ class Client extends JFrame implements ActionListener, Runnable{
         try{
             while(true){
                 String message = (String)inputStream.readObject();
-                String[] actualValue = message.split(" ");
-
-                System.out.println(permission);
-                printReceivedMessage(message);
-                if(actualValue[0].equals("login"))
-                {
-                   setPermission(true);
-
-                    System.out.println(permission);
+                //if (message == "") return "ERROR NO ANSWER";
+                String[] substrings = message.split("#");
+                int parimeters = substrings.length;
+                int exCode = -1;
+                String response = "ERROR";
+                switch (substrings[0]) {
+                    case "LOGIN":
+                        //Adam#Haslo!123
+                        if(substrings[1]=="SUCCESSFUL") setPermission(true);
+                        else{
+                            if(substrings[1]=="WRONGPASS")
+                                JOptionPane.showMessageDialog(null, "Podane hasło jest nieprawidłowe");
+                            else if(substrings[1]=="WRONGNAME")
+                                JOptionPane.showMessageDialog(null, "Podany użytkownik nie istnieje");
+                            else JOptionPane.showMessageDialog(null, substrings[1]);
+                        }
+                        break;
                 }
+//                String[] actualValue = message.split("#");
+//                System.out.println(permission);
+//                printReceivedMessage(message);
+//                if(actualValue[0].equals("LOGIN"))
+//                {
+//                    if
+//                   setPermission(true);
+//
+//                    System.out.println(permission);
+//                }
 
 
             }
@@ -332,5 +378,13 @@ class Client extends JFrame implements ActionListener, Runnable{
         }
     }
 
+    public int loginRequest(String req){
+
+        String response = null;
+        if(response =="LOGIN#SUCCESSFUL") return 0;
+        if(response =="LOGIN#WRONGPASS") return -1;
+        if(response =="LOGIN#WRONGNAME") return -2;
+        else return Integer.parseInt(response.replace("LOGIN#ERROR: ",""));
+    }
 
 }

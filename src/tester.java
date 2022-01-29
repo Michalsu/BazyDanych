@@ -17,7 +17,7 @@ public class tester {
     //    System.out.println(Request.parseRequest("SEARCH#123'; Drop table klient -- ",con));
      //   System.out.println(Request.parseRequest("LOGINEMP#LoginPracownik31#A!2345678",con));
      //   System.out.println(Request.parseRequest("LOGINUSER#Login1#haslo!1",con));
-     //   Request.parseRequest("REGISTER#NowyKlient#Haslo!123#Michal#Sujewicz#123857693#abc@mail.com#12354#Grzybowa#7",con);
+      //  Request.parseRequest("REGISTER#Adam#Haslo!123#Adam#Adam#693#abcdef234@mail.com#12554#Grzybowa#7",con);
       //  System.out.println(Request.parseRequest("LOGINUSER#NowyKlient#Haslo!122",con));
       //  System.out.println(Request.parseRequest("LOGINUSER#NowyKlient#Haslo!123",con));
      //   System.out.println(Request.parseRequest("CHANGEPASSUSER#NowyKlient#Haslo!123#Haslo!122",con));
