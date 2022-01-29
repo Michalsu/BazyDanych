@@ -453,8 +453,13 @@ class Client extends JFrame implements ActionListener, Runnable{
                 switch (substrings[0]) {
                     case "LOGIN":
                         //Adam#Haslo!123
-                        if(substrings[1].equals("SUCCESSFUL"))
+                        if(substrings[1].equals("SUCCESSFUL")){
                             setPermission(true);
+                            CardLayout cl = (CardLayout)(cards.getLayout());
+                            cl.show(cards,CLIENTPANEL);
+                            this.setSize(new Dimension(600,500));
+                        }
+
                         else if(substrings[1].equals("WRONGPASS"))
                             JOptionPane.showMessageDialog(null, "Podane hasło jest nieprawidłowe");
                         else if(substrings[1].equals("WRONGNAME"))
