@@ -9,16 +9,21 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 
 class Client extends JFrame implements ActionListener, Runnable{
 
     private static final long serialVersionUID = 1L;
 
-    final static String LOGINPANEL = "Card with JButtons";
-    final static String REGISTERPANEL = "Card with JTextField";
+    final static String LOGINPANEL = "Login layout";
+    final static String REGISTERPANEL = "Register layout";
+    final static String CLIENTPANEL = "Client panel layout";
+
     private static boolean permission;
     JPanel cards; //a panel that uses CardLayout
 
@@ -30,8 +35,8 @@ class Client extends JFrame implements ActionListener, Runnable{
     public void addComponentToPane(JFrame pane) {
 
         //layout startowy
-        JPanel card1 = new JPanel();
-        card1.setLayout(null);
+        JPanel loginLayout = new JPanel();
+        loginLayout.setLayout(null);
         JLabel label1 = new JLabel("Logowanie", SwingConstants.CENTER);
         JLabel loginLabel = new JLabel("Login");
         JLabel passwordLabel = new JLabel("Hasło");
@@ -51,6 +56,19 @@ class Client extends JFrame implements ActionListener, Runnable{
         loginLabel.setBounds(50,65, 40,30);
         passwordLabel.setBounds(50,100,40,30);
 
+
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if(permission){
+                    CardLayout cl = (CardLayout)(cards.getLayout());
+                     cl.show(cards,CLIENTPANEL);
+                      pane.setSize(new Dimension(600,500));
+                }
+
+            }
+        });
+
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -64,9 +82,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                //if(login.getText().isEmpty() || password.getText().isEmpty())
-                System.out.println(permission);
-                if(Client.permission == true)
+                if(login.getText().isEmpty() || password.getText().isEmpty())
                 {
                     JOptionPane.showMessageDialog(null,"Nieprawidłowe dane");
                 }
@@ -76,17 +92,17 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 
 
-        card1.add(loginLabel);
-        card1.add(label1);
-        card1.add(passwordLabel);
-        card1.add(loginButton);
-        card1.add(registerButton);
-        card1.add(password);
-        card1.add(login);
-        card1.add(new JButton("Register"));
+        loginLayout.add(loginLabel);
+        loginLayout.add(label1);
+        loginLayout.add(passwordLabel);
+        loginLayout.add(loginButton);
+        loginLayout.add(registerButton);
+        loginLayout.add(password);
+        loginLayout.add(login);
+        loginLayout.add(new JButton("Register"));
 
         //layout rejestracji
-        JPanel card2 = new JPanel();
+        JPanel RegisterLayout = new JPanel();
         JLabel registerLabel = new JLabel("Rejestracja",SwingConstants.CENTER);
         registerLabel.setFont(new Font("Serif", Font.BOLD, 14));
         JLabel adressLabel = new JLabel("Adres",SwingConstants.CENTER);
@@ -122,22 +138,22 @@ class Client extends JFrame implements ActionListener, Runnable{
         register.setBounds(65,400,200,30);
 
 
-        card2.setLayout(null);
+        RegisterLayout.setLayout(null);
 
-        card2.add(registerLabel);
-        card2.add(loginField);
-        card2.add(passwordField);
-        card2.add(nameField);
-        card2.add(surnameField);
-        card2.add(phoneField);
-        card2.add(mailField);
+        RegisterLayout.add(registerLabel);
+        RegisterLayout.add(loginField);
+        RegisterLayout.add(passwordField);
+        RegisterLayout.add(nameField);
+        RegisterLayout.add(surnameField);
+        RegisterLayout.add(phoneField);
+        RegisterLayout.add(mailField);
 
-        card2.add(adressLabel);
-        card2.add(postCodeField);
-        card2.add(streetField);
-        card2.add(homeNumberField);
+        RegisterLayout.add(adressLabel);
+        RegisterLayout.add(postCodeField);
+        RegisterLayout.add(streetField);
+        RegisterLayout.add(homeNumberField);
 
-        card2.add(register);
+        RegisterLayout.add(register);
 
 
         register.addActionListener(new ActionListener() {
@@ -163,11 +179,95 @@ class Client extends JFrame implements ActionListener, Runnable{
             }
         });
 
+        //layout panelu użytkownika
+        JPanel panelLayout = new JPanel();
 
-        //Create the panel that contains the "cards".
+        //wektor na kategorie, wczytane z bazy
+        Vector<String> vect = new Vector<>();
+        for (int i = 0;i<20;i++) {
+            String temp = "kategoria" + i;
+             vect.add(temp);
+        }
+
+        //vector na listy przedmiotów z każdej kategorii
+        //tutaj trzeba wczytać poszczególne przedmioty z bazy danych
+        Vector<Pair<DefaultListModel,String>> vectOfItemsByCategory= new Vector<Pair<DefaultListModel,String>>();
+
+        for (int i = 0;i<20;i++) {
+            DefaultListModel list = new DefaultListModel();
+            String desc = null;
+            for (int j = 0; j < 40; j++) {
+                String temp = "Przedmiot" + i;
+                 desc  = "Opis" + j;
+                list.addElement(temp);
+
+            }
+            vectOfItemsByCategory.addElement(new Pair<>(list,desc));
+        }
+
+
+        JLabel categoryLabel = new JLabel("Kategoria");
+        JLabel itemsLabel = new JLabel("Przedmioty");
+        //miejsce na opis przedmiotu
+        JTextArea itemsDescrition = new JTextArea();
+        String descrition = "opis";
+
+        JList categoryList =  new JList(vect);
+        JList itemsList = new JList();
+
+
+        JScrollPane itemScroll = new JScrollPane(itemsList,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+
+
+        categoryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        categoryList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                    itemsList.setModel(vectOfItemsByCategory.get(categoryList.getSelectedIndex()).getL());
+
+                }
+
+        });
+        itemsList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+            //   itemsDescrition.setText(vectOfItemsByCategory.get(itemsList.getSelectedIndex()).getR());
+
+            }
+
+        });
+       JScrollPane categoryScroll = new JScrollPane(categoryList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+
+        categoryLabel.setBounds(10,10,80,30);
+        categoryScroll.setBounds(10,40,150,vect.size()*10);
+        itemsLabel.setBounds(180,10,80,30);
+        itemScroll.setBounds(180,40,200,vect.size()*10);
+        itemsDescrition.setBounds(10,270,340,100);
+
+
+        panelLayout.add(categoryLabel);
+        panelLayout.add(itemsLabel);
+        panelLayout.add(itemScroll);
+        panelLayout.add(categoryScroll);
+        panelLayout.add(itemsDescrition);
+
+
+
+        panelLayout.setLayout(null);
+
+
+
+
+
+        //dodawanie widoków do ramki
         cards = new JPanel(new CardLayout());
-        cards.add(card1, LOGINPANEL);
-        cards.add(card2, REGISTERPANEL);
+        cards.add(loginLayout, LOGINPANEL);
+        cards.add(RegisterLayout, REGISTERPANEL);
+        cards.add(panelLayout,CLIENTPANEL);
         pane.add(cards, BorderLayout.CENTER);
 
 
@@ -184,12 +284,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         String type ;
 
 
-
             new Client("1", host);
-        new Client("name", host);
-
-
-
 
     }
 
@@ -257,39 +352,12 @@ class Client extends JFrame implements ActionListener, Runnable{
         // do oczekiwania na komunikaty od serwera
     }
 
-    synchronized public void printReceivedMessage(String message){
-        String tmp_text = textArea.getText();
-        textArea.setText(tmp_text + ">>> " + message + "\n");
-    }
-
-    synchronized public void printSentMessage(String message){
-        String text = textArea.getText();
-        textArea.setText(text + "<<< " + message + "\n");
-    }
 
     public void actionPerformed(ActionEvent event)
     { String message;
         Object source = event.getSource();
-        if (source==messageField) {
-            try {
-                message = messageField.getText();
-                String[] actualValue = message.split(" ");
-                outputStream.writeObject(message);
-                printSentMessage(message);
 
 
-            } catch (IOException e) {
-                printReceivedMessage("ERROR " + e);
-            }catch (IndexOutOfBoundsException exception)
-            {
-                printReceivedMessage("ERROR nieprawidłowe dane ");
-            } catch (Exception e) {
-                e.printStackTrace();
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        }
-        repaint();
     }
 
     public void run(){
@@ -314,15 +382,11 @@ class Client extends JFrame implements ActionListener, Runnable{
                 String message = (String)inputStream.readObject();
                 String[] actualValue = message.split(" ");
 
-                System.out.println(permission);
-                printReceivedMessage(message);
+
                 if(actualValue[0].equals("login"))
                 {
                    setPermission(true);
-
-                    System.out.println(permission);
                 }
-
 
             }
         } catch(Exception e){
