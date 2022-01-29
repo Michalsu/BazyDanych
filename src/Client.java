@@ -86,33 +86,28 @@ class Client extends JFrame implements ActionListener, Runnable{
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if(!(permission || login.getText().isEmpty() || password.getText().isEmpty())){
-                    //if(login.getText().isEmpty() || password.getText().isEmpty())
                     boolean sendrequest=true;
+                    StringBuilder combinedMessage = new StringBuilder();
                     if(DataSecurity.containIllegalSymbols(login.getText())){
-                        JOptionPane.showMessageDialog(null, "login zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #");
+                        combinedMessage.append("login zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #\n");
                         sendrequest=false;
                     }
                     if(DataSecurity.containIllegalSymbols(password.getText())){
-                        JOptionPane.showMessageDialog(null, "hasło zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #");
+                        combinedMessage.append("hasło zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #\n");
                         sendrequest=false;
                     }
                     if(!DataSecurity.passwordValid(password.getText())) {
-                        JOptionPane.showMessageDialog(null, "hasło nie spełnia minimalnych wymagan dlugość >=8, litery, cyfry, znaki specjalne");
+                        combinedMessage.append("hasło nie spełnia minimalnych wymagan: dlugość >=8, litery, cyfry, znaki specjalne");
                         sendrequest=false;
                     }
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("LOGINUSER#");
-                    sb.append(login.getText()+ "#");
-                    sb.append(password.getText());
-                    sendMessage(sb.toString());
-
-                    //System.out.println(permission);
-                    //if(Client.permission == true)
-                    //{
-                    //    JOptionPane.showMessageDialog(null,"Nieprawidłowe dane");
-                    //}
-                }
-
+                    if(sendrequest){
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("LOGINUSER#");
+                        sb.append(login.getText()+ "#");
+                        sb.append(password.getText());
+                        sendMessage(sb.toString());
+                    }else JOptionPane.showMessageDialog(null, combinedMessage.toString());
+                }else JOptionPane.showMessageDialog(null, "Musisz wprowadzić dane logowania");
             }
         });
 
@@ -188,20 +183,90 @@ class Client extends JFrame implements ActionListener, Runnable{
                         || nameField.getText().isEmpty() || surnameField.getText().isEmpty() ||
                         phoneField.getText().isEmpty() || mailField.getText().isEmpty() ||
                         postCodeField.getText().isEmpty() ||  streetField.getText().isEmpty() ||
-                        homeNumberField.getText().isEmpty()
+                        homeNumberField.getText().isEmpty())
+                    JOptionPane.showMessageDialog(null, "Musisz wprowadzić wszystkie dane");
+                else {
+                    StringBuilder combinedMessage = new StringBuilder();
+                    boolean sendrequest = true;
+                    if (DataSecurity.containIllegalSymbols(loginField.getText())) {
+                        combinedMessage.append("login zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #\n");
+                        sendrequest = false;
+                    }
+                    if (DataSecurity.containIllegalSymbols(passwordField.getText())) {
+                        combinedMessage.append("hasło zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #\n");
+                        sendrequest = false;
+                    }
+                    if (!DataSecurity.passwordValid(passwordField.getText())) {
+                        combinedMessage.append("hasło nie spełnia minimalnych wymagan: dlugość >=8, litery, cyfry, znaki specjalne\n");
+                        sendrequest = false;
+                    }
+                    if (DataSecurity.containIllegalSymbols(nameField.getText())) {
+                        combinedMessage.append("imię zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #\n");
+                        sendrequest = false;
+                    }
+                    if (DataSecurity.containIllegalSymbols(surnameField.getText())) {
+                        combinedMessage.append("nazwisko zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #\n");
+                        sendrequest = false;
+                    }
+                    try{
+                        int numer = Integer.parseInt(phoneField.getText());
+                        if(phoneField.getText().length()!=9) {
+                            combinedMessage.append("numer telefonu powinien mieć długość 9\n");
+                            sendrequest = false;
+                        }
+                    }catch (NumberFormatException e){
+                        combinedMessage.append("numer telefonu powinien być liczbą\n");
+                        sendrequest = false;
+                    }
+                    if (DataSecurity.containIllegalSymbols(mailField.getText())) {
+                        combinedMessage.append("nazwisko zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #\n");
+                        sendrequest = false;
+                    }
+                    if (!(mailField.getText().contains("@"))) {
+                        combinedMessage.append("podaj prawidłowy adres email\n");
+                        sendrequest = false;
+                    }
+                    try{
+                        int numer = Integer.parseInt(postCodeField.getText());
+                        if(postCodeField.getText().length()!=5) {
+                            combinedMessage.append("kod pocztowy powinien miec dlugosc 5\n");
+                            sendrequest = false;
+                        }
+                    }catch (NumberFormatException e){
+                        combinedMessage.append("kod powinien byc zapisany jako 5 cyfr\n");
+                        sendrequest = false;
+                    }
+                    if (DataSecurity.containIllegalSymbols(streetField.getText())) {
+                        combinedMessage.append("ulica zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #\n");
+                        sendrequest = false;
+                    }
+                    try{
+                        int numer = Integer.parseInt(homeNumberField.getText());
+                    }catch (NumberFormatException e){
+                        combinedMessage.append("numer domu powinien byc liczba");
+                        sendrequest = false;
+                    }
+                    if(sendrequest){
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("REGISTER#");
+                        sb.append(loginField.getText()+ "#");
+                        sb.append(passwordField.getText()+ "#");
+                        sb.append(nameField.getText()+ "#");
+                        sb.append(surnameField.getText()+ "#");
+                        sb.append(phoneField.getText()+ "#");
+                        sb.append(mailField.getText()+ "#");
+                        sb.append(postCodeField.getText()+ "#");
+                        sb.append(streetField.getText()+ "#");
+                        sb.append(homeNumberField.getText());
+                        sendMessage(sb.toString());
+                    }else JOptionPane.showMessageDialog(null, combinedMessage.toString());
 
-                )
-                {
-                    JOptionPane.showMessageDialog(null,"Nieprawidłowe dane");
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(null,"Zarejestrowano");
-                    CardLayout cl = (CardLayout)(cards.getLayout());
-                    cl.show(cards,LOGINPANEL);
-                    pane.setSize(new Dimension(355,300));
+
+                   // JOptionPane.showMessageDialog(null, "Zarejestrowano");
+
                 }
             }
+
         });
 
         //layout panelu użytkownika
@@ -534,6 +599,15 @@ class Client extends JFrame implements ActionListener, Runnable{
                         else if(substrings[1].equals("WRONGNAME"))
                             JOptionPane.showMessageDialog(null, "Podany użytkownik nie istnieje");
                         else if(!permission) JOptionPane.showMessageDialog(null, substrings[1]);
+                        break;
+                    case "REGISTER":
+                        if(substrings[1].equals("SUCCESSFUL")) {
+                            CardLayout cl = (CardLayout) (cards.getLayout());
+                            cl.show(cards, LOGINPANEL);
+                            this.setSize(new Dimension(355, 300));
+                            JOptionPane.showMessageDialog(null, "Zarejestrowano");
+                        }
+                        else JOptionPane.showMessageDialog(null, substrings[1]);
                         break;
                 }
 //                String[] actualValue = message.split("#");
