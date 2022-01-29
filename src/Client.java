@@ -32,6 +32,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         this.permission = permission;
     }
 
+
     public void addComponentToPane(JFrame pane) {
 
         //layout startowy
@@ -60,6 +61,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                System.out.println(permission);
                 if(permission){
                     CardLayout cl = (CardLayout)(cards.getLayout());
                      cl.show(cards,CLIENTPANEL);
@@ -82,35 +84,36 @@ class Client extends JFrame implements ActionListener, Runnable{
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                //if(login.getText().isEmpty() || password.getText().isEmpty())
-                boolean sendrequest=true;
-                if(DataSecurity.containIllegalSymbols(login.getText())){
-                   JOptionPane.showMessageDialog(null, "login zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #");
-                   sendrequest=false;
-                }
-                if(DataSecurity.containIllegalSymbols(password.getText())){
-                    JOptionPane.showMessageDialog(null, "hasło zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #");
-                    sendrequest=false;
-                }
-                if(!DataSecurity.passwordValid(password.getText())) {
-                    JOptionPane.showMessageDialog(null, "hasło nie spełnia minimalnych wymagan dlugość >=8, litery, cyfry, znaki specjalne");
-                    sendrequest=false;
-                }
-                StringBuilder sb = new StringBuilder();
-                sb.append("LOGINUSER#");
-                sb.append(login.getText()+ "#");
-                sb.append(password.getText());
-                sendMessage(sb.toString());
+                if(!permission){
+                    //if(login.getText().isEmpty() || password.getText().isEmpty())
+                    boolean sendrequest=true;
+                    if(DataSecurity.containIllegalSymbols(login.getText())){
+                        JOptionPane.showMessageDialog(null, "login zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #");
+                        sendrequest=false;
+                    }
+                    if(DataSecurity.containIllegalSymbols(password.getText())){
+                        JOptionPane.showMessageDialog(null, "hasło zawiera niedozwolone symbole (; \' \" \\ [ ] { } / ) #");
+                        sendrequest=false;
+                    }
+                    if(!DataSecurity.passwordValid(password.getText())) {
+                        JOptionPane.showMessageDialog(null, "hasło nie spełnia minimalnych wymagan dlugość >=8, litery, cyfry, znaki specjalne");
+                        sendrequest=false;
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("LOGINUSER#");
+                    sb.append(login.getText()+ "#");
+                    sb.append(password.getText());
+                    sendMessage(sb.toString());
 
-                //System.out.println(permission);
-                //if(Client.permission == true)
-                //{
-                //    JOptionPane.showMessageDialog(null,"Nieprawidłowe dane");
-                //}
+                    //System.out.println(permission);
+                    //if(Client.permission == true)
+                    //{
+                    //    JOptionPane.showMessageDialog(null,"Nieprawidłowe dane");
+                    //}
+                }
+
             }
         });
-
-
 
 
         loginLayout.add(loginLabel);
@@ -450,14 +453,13 @@ class Client extends JFrame implements ActionListener, Runnable{
                 switch (substrings[0]) {
                     case "LOGIN":
                         //Adam#Haslo!123
-                        if(substrings[1]=="SUCCESSFUL") setPermission(true);
-                        else{
-                            if(substrings[1]=="WRONGPASS")
-                                JOptionPane.showMessageDialog(null, "Podane hasło jest nieprawidłowe");
-                            else if(substrings[1]=="WRONGNAME")
-                                JOptionPane.showMessageDialog(null, "Podany użytkownik nie istnieje");
-                            else JOptionPane.showMessageDialog(null, substrings[1]);
-                        }
+                        if(substrings[1].equals("SUCCESSFUL"))
+                            setPermission(true);
+                        else if(substrings[1].equals("WRONGPASS"))
+                            JOptionPane.showMessageDialog(null, "Podane hasło jest nieprawidłowe");
+                        else if(substrings[1].equals("WRONGNAME"))
+                            JOptionPane.showMessageDialog(null, "Podany użytkownik nie istnieje");
+                        else if(!permission) JOptionPane.showMessageDialog(null, substrings[1]);
                         break;
                 }
 //                String[] actualValue = message.split("#");
