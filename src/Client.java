@@ -16,16 +16,18 @@ import javax.swing.*;
 class Client extends JFrame implements ActionListener, Runnable{
 
     private static final long serialVersionUID = 1L;
-    private static JFrame frame;
+
     final static String LOGINPANEL = "Card with JButtons";
     final static String REGISTERPANEL = "Card with JTextField";
+    private static boolean permission;
     JPanel cards; //a panel that uses CardLayout
 
-    public Client() {
 
+    public void setPermission(boolean permission) {
+        this.permission = permission;
     }
 
-    public void addComponentToPane(Container pane) {
+    public void addComponentToPane(JFrame pane) {
 
         //layout startowy
         JPanel card1 = new JPanel();
@@ -54,7 +56,7 @@ class Client extends JFrame implements ActionListener, Runnable{
             public void actionPerformed(ActionEvent actionEvent) {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,REGISTERPANEL);
-                frame.setSize(new Dimension(350,500));
+                pane.setSize(new Dimension(350,500));
             }
         });
 
@@ -62,7 +64,9 @@ class Client extends JFrame implements ActionListener, Runnable{
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if(login.getText().isEmpty() || password.getText().isEmpty())
+                //if(login.getText().isEmpty() || password.getText().isEmpty())
+                System.out.println(permission);
+                if(Client.permission == true)
                 {
                     JOptionPane.showMessageDialog(null,"Nieprawidłowe dane");
                 }
@@ -154,7 +158,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                     JOptionPane.showMessageDialog(null,"Zarejestrowano");
                     CardLayout cl = (CardLayout)(cards.getLayout());
                     cl.show(cards,LOGINPANEL);
-                    frame.setSize(new Dimension(355,300));
+                    pane.setSize(new Dimension(355,300));
                 }
             }
         });
@@ -168,49 +172,25 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 
     }
-    private static void createAndShowGUI() {
+
+    private void createAndShowGUI() {
         //Create and set up the window.
-        frame = new JFrame("Klient");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //   frame.setPreferredSize(new Dimension(400, 300));
-        //Create and set up the content pane.
 
-        Client demo = new Client();
-        demo.addComponentToPane(frame.getContentPane());
-        frame.setLocationRelativeTo(null);
-        frame.setSize(355,300);
-        //Display the window.
-        frame.setVisible(true);
     }
     public static void main(String[] args) {
         String name = "klient";
         String host = "";
         String type ;
 
-        try {
-            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-        } catch (UnsupportedLookAndFeelException ex) {
-            ex.printStackTrace();
-        } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
-        } catch (InstantiationException ex) {
-            ex.printStackTrace();
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-        }
-        /* Turn off metal's use of bold fonts */
-        UIManager.put("swing.boldMetal", Boolean.FALSE);
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
-        if (name != null && !name.equals("")) {
-            new Client(name, host);
 
-        }
+
+            new Client("1", host);
+        new Client("name", host);
+
+
+
+
     }
 
 
@@ -229,7 +209,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         super(name);
         this.name = name;
         this.serverHost = host;
-
+        this.permission = false;
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -249,7 +229,29 @@ class Client extends JFrame implements ActionListener, Runnable{
             }
         });
 
+        try {
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+        } catch (UnsupportedLookAndFeelException ex) {
+            ex.printStackTrace();
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+        } catch (InstantiationException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
 
+
+        //Create and set up the content pane.
+        addComponentToPane(this);
+        setLocationRelativeTo(null);
+        setSize(355,300);
+        //Display the window.
+
+        setVisible(true);
+        /* Turn off metal's use of bold fonts */
+        UIManager.put("swing.boldMetal", Boolean.FALSE);
 
         new Thread(this).start();  // Uruchomienie dodatkowego w�tka
         // do oczekiwania na komunikaty od serwera
@@ -310,7 +312,17 @@ class Client extends JFrame implements ActionListener, Runnable{
         try{
             while(true){
                 String message = (String)inputStream.readObject();
+                String[] actualValue = message.split(" ");
+
+                System.out.println(permission);
                 printReceivedMessage(message);
+                if(actualValue[0].equals("login"))
+                {
+                   setPermission(true);
+
+                    System.out.println(permission);
+                }
+
 
             }
         } catch(Exception e){

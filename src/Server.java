@@ -180,8 +180,10 @@ class ClientThread implements Runnable {
             String text;
             outputStream = output;
             name = (String)input.readObject();
-            type =  (String)input.readObject();
-            System.out.println(type);
+
+            myServer.addClient(this);
+            output.writeObject("login");
+
             /*while(!ifDataCorrect) {
                  text = "Wpisz login";
                 output.writeObject(text);
