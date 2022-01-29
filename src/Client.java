@@ -602,10 +602,10 @@ class Client extends JFrame implements ActionListener, Runnable{
                         break;
                     case "REGISTER":
                         if(substrings[1].equals("SUCCESSFUL")) {
+                            JOptionPane.showMessageDialog(null, "Zarejestrowano");
                             CardLayout cl = (CardLayout) (cards.getLayout());
                             cl.show(cards, LOGINPANEL);
                             this.setSize(new Dimension(355, 300));
-                            JOptionPane.showMessageDialog(null, "Zarejestrowano");
                         }
                         else JOptionPane.showMessageDialog(null, substrings[1]);
                         break;

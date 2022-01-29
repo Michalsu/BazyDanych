@@ -372,8 +372,10 @@ public class Request {
                             Integer.parseInt(substrings[5]),substrings[6],Integer.parseInt(substrings[7]),
                             substrings[8],Integer.parseInt(substrings[9]));
                 }else System.out.println("Błędny ciąg");
-                if(exCode==0) response = "REGISTER#SUCCESFUL";
-                else response = "REGISTER#ERROR#"+exCode;
+                if(exCode==0) response = "REGISTER#SUCCESSFUL";
+                else if (exCode==-1) response = "REGISTER#PHONE OR EMAIL USED";
+                else if (exCode==-2) response = "REGISTER#USERNAME ALREADY USED";
+                else response = "REGISTER#ERROR "+exCode;
                 break;
             case "ADDPRODUCT":
 
@@ -1171,9 +1173,9 @@ else {
 
     public static int register(Connection con, String logi, String haslo, String imie, String nazwisko,
                                int numerTel,String mail, int kodPoczt, String ulica, int numerMiesz){
-        if(DataSecurity.containIllegalSymbols(logi)) return -3;
-        if(DataSecurity.containIllegalSymbols(haslo)) return -4;
-
+        if(DataSecurity.containIllegalSymbols(logi)) return -9;
+        if(DataSecurity.containIllegalSymbols(haslo)) return -10;
+        int exCode=-1;
         try {
             con.setAutoCommit(false);
             Statement stmt;
@@ -1233,8 +1235,10 @@ else {
 
             try{
                 if(con!=null) con.rollback();
+
                 }catch (SQLException se){
                     se.printStackTrace();
+                    exCode = -3;
                 }
         }finally{
             try {
@@ -1243,7 +1247,7 @@ else {
                 e.printStackTrace();
             }
         }
-        return -1;
+        return exCode;
     }
 
 
