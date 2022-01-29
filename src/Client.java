@@ -211,19 +211,23 @@ class Client extends JFrame implements ActionListener, Runnable{
         }
 
         //vector na listy przedmiotów z każdej kategorii
-        //tutaj trzeba wczytać poszczególne przedmioty z bazy danych
-        Vector<Pair<DefaultListModel,String>> vectOfItemsByCategory= new Vector<Pair<DefaultListModel,String>>();
+        //tutaj trzeba wczytać poszczególne przedmioty z bazy danych i ich opisy
+        Vector<Pair<DefaultListModel,DefaultListModel>> vectOfItemsByCategory= new Vector<Pair<DefaultListModel,DefaultListModel>>();
 
         for (int i = 0;i<20;i++) {
-            DefaultListModel list = new DefaultListModel();
-            String desc = null;
+            DefaultListModel listOfItems = new DefaultListModel();
+            DefaultListModel listOfItemsDesc = new DefaultListModel();
+
+            String desc  = null;
             for (int j = 0; j < 40; j++) {
                 String temp = "Przedmiot" + i;
-                 desc  = "Opis" + j;
-                list.addElement(temp);
+                 desc  = "Opis" + i;
+                listOfItems.addElement(temp);
+                listOfItemsDesc.addElement(desc);
 
             }
-            vectOfItemsByCategory.addElement(new Pair<>(list,desc));
+            vectOfItemsByCategory.addElement(new Pair<>(listOfItems,listOfItemsDesc));
+
         }
 
 
@@ -231,7 +235,13 @@ class Client extends JFrame implements ActionListener, Runnable{
         JLabel itemsLabel = new JLabel("Przedmioty");
         //miejsce na opis przedmiotu
         JTextArea itemsDescrition = new JTextArea();
-        String descrition = "opis";
+
+
+        JButton addToCartButton = new JButton("Dodaj do koszyka");
+        JLabel countLabel = new JLabel("Ilość");
+        JTextField countField = new JTextField();
+
+
 
         JList categoryList =  new JList(vect);
         JList itemsList = new JList();
@@ -241,24 +251,32 @@ class Client extends JFrame implements ActionListener, Runnable{
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 
-
+        itemsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         categoryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        //aktualiacja przedmiotów dla wybranej listy
         categoryList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                    itemsList.setModel(vectOfItemsByCategory.get(categoryList.getSelectedIndex()).getL());
-
+                if(!e.getValueIsAdjusting())
+                itemsList.setModel(vectOfItemsByCategory.get(categoryList.getSelectedIndex()).getL());
+                itemsList.setSelectedIndex(0);
                 }
 
         });
+
+      //aktualziacja opisu dla wybranego przedmiotu
         itemsList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-            //   itemsDescrition.setText(vectOfItemsByCategory.get(itemsList.getSelectedIndex()).getR());
+
+                    if(itemsList.getSelectedIndex()!=-1)
+                    itemsDescrition.setText((String) vectOfItemsByCategory.get(categoryList.getSelectedIndex()).getR().get(itemsList.getSelectedIndex()));
 
             }
 
         });
+
+
        JScrollPane categoryScroll = new JScrollPane(categoryList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
@@ -268,6 +286,9 @@ class Client extends JFrame implements ActionListener, Runnable{
         itemsLabel.setBounds(180,10,80,30);
         itemScroll.setBounds(180,40,200,vect.size()*10);
         itemsDescrition.setBounds(10,270,340,100);
+        countLabel.setBounds(10,380,40,30);
+        countField.setBounds(45,380,50,30);
+        addToCartButton.setBounds(100,380, 200,30);
 
 
         panelLayout.add(categoryLabel);
@@ -275,7 +296,9 @@ class Client extends JFrame implements ActionListener, Runnable{
         panelLayout.add(itemScroll);
         panelLayout.add(categoryScroll);
         panelLayout.add(itemsDescrition);
-
+        panelLayout.add(countLabel);
+        panelLayout.add(countField);
+        panelLayout.add(addToCartButton);
 
 
         panelLayout.setLayout(null);
@@ -307,7 +330,7 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 
             new Client("1", host);
-        new Client("name", host);
+       // new Client("name", host);
 
 
 
@@ -450,14 +473,18 @@ class Client extends JFrame implements ActionListener, Runnable{
                 switch (substrings[0]) {
                     case "LOGIN":
                         //Adam#Haslo!123
-                        if(substrings[1]=="SUCCESSFUL") setPermission(true);
-                        else{
-                            if(substrings[1]=="WRONGPASS")
-                                JOptionPane.showMessageDialog(null, "Podane hasło jest nieprawidłowe");
-                            else if(substrings[1]=="WRONGNAME")
-                                JOptionPane.showMessageDialog(null, "Podany użytkownik nie istnieje");
-                            else JOptionPane.showMessageDialog(null, substrings[1]);
+                        if(substrings[1].equals("SUCCESSFUL")){
+                            setPermission(true);
+                            CardLayout cl = (CardLayout)(cards.getLayout());
+                            cl.show(cards,CLIENTPANEL);
+                            this.setSize(new Dimension(600,500));
                         }
+
+                        else if(substrings[1].equals("WRONGPASS"))
+                            JOptionPane.showMessageDialog(null, "Podane hasło jest nieprawidłowe");
+                        else if(substrings[1].equals("WRONGNAME"))
+                            JOptionPane.showMessageDialog(null, "Podany użytkownik nie istnieje");
+                        else if(!permission) JOptionPane.showMessageDialog(null, substrings[1]);
                         break;
                 }
 //                String[] actualValue = message.split("#");
@@ -479,6 +506,7 @@ class Client extends JFrame implements ActionListener, Runnable{
             dispose();
         }
     }
+
 
     public int loginRequest(String req){
 
