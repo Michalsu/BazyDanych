@@ -186,7 +186,7 @@ class Client extends JFrame implements ActionListener, Runnable{
     public static void main(String[] args) {
         String name = "klient";
         String host = "";
-        String type = "kilent";
+        String type ;
 
         try {
             //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
