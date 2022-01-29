@@ -65,7 +65,7 @@ public class Request {
                         response = rs.getFloat("cena")+"#"+ rs.getInt("Promocja") +"#"+
                                 rs.getString("nazwa")+ "#"+rs.getString("opis")+"#"+
                                 rs.getString("kategoria")+"#"+
-                                rs.getInt("ID")+"\n";
+                                rs.getInt("ID")+"#";
                         i++;
                         ab.append(response);
 

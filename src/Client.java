@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -25,6 +26,8 @@ class Client extends JFrame implements ActionListener, Runnable{
     final static String CLIENTPANEL = "Client panel layout";
     final static String CARTPANEL = "Cart layout";
 
+
+    static Vector<Product> produkty = new Vector<>();
     private static boolean permission;
     JPanel cards; //a panel that uses CardLayout
 
@@ -310,6 +313,22 @@ class Client extends JFrame implements ActionListener, Runnable{
         JLabel countLabel = new JLabel("Ilość");
         JTextField countField = new JTextField();
 
+
+        //TODO
+        // ja tu tylko testuje searcha trzeba to naprawic
+        //-------------------------------------------------------------
+
+        addToCartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendMessage("SEARCH#12");
+            }
+        });
+
+
+        //------------------------------------------------------------
+
+
         //Panel użykownika
 
         JButton viewCartButton = new JButton("Wyświetl koszyk");
@@ -318,9 +337,12 @@ class Client extends JFrame implements ActionListener, Runnable{
         JButton logoutButton = new JButton("Wyloguj");
 
 
-
+        //TODO
+        // tu tez sobie testuje searcha
+        // było
+        // JList itemsList =  new JList(vect);
         JList categoryList =  new JList(vect);
-        JList itemsList = new JList();
+        JList itemsList = new JList(produkty);
 
 
         JScrollPane itemScroll = new JScrollPane(itemsList,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
@@ -608,6 +630,16 @@ class Client extends JFrame implements ActionListener, Runnable{
                             this.setSize(new Dimension(355, 300));
                         }
                         else JOptionPane.showMessageDialog(null, substrings[1]);
+                        break;
+
+                    case "SEARCH":
+                        int ilosc= Integer.parseInt(substrings[1]);
+                        produkty = new Vector<Product>();
+                        for(int i =0;i<ilosc;i++){
+                            produkty.add(new Product(Integer.parseInt(substrings[6*i+7]), substrings[6*i+4], substrings[6*i+5], Float.parseFloat(substrings[6*i+2]), Integer.parseInt(substrings[6*i+3]), substrings[6*i+6]));
+                        }
+                        System.out.println(produkty);
+
                         break;
                 }
 //                String[] actualValue = message.split("#");
