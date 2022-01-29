@@ -226,7 +226,7 @@ class ClientThread implements Runnable {
                 message = (String)input.readObject();
                 String answ;
                 myServer.printReceivedMessage(this,message);
-                if (message.equals("BYE")){
+                if (message.equals("LOGOUT")){
                     myServer.removeClient(this);
                     input.close();
                     output.close();

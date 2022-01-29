@@ -371,9 +371,9 @@ public class Request {
                     exCode = register(con,substrings[1],substrings[2],substrings[3],substrings[4],
                             Integer.parseInt(substrings[5]),substrings[6],Integer.parseInt(substrings[7]),
                             substrings[8],Integer.parseInt(substrings[9]));
-                }
-
-                else System.out.println("Błędny ciąg");
+                }else System.out.println("Błędny ciąg");
+                if(exCode==0) response = "REGISTER#SUCCESFUL";
+                else response = "REGISTER#ERROR#"+exCode;
                 break;
             case "ADDPRODUCT":
 
@@ -1169,12 +1169,13 @@ else {
     }
 
 
-    public static int register(Connection con, String logi, String haslo, String imie, String nazwisko, int numerTel,String mail, int kodPoczt, String ulica, int numerMiesz){
+    public static int register(Connection con, String logi, String haslo, String imie, String nazwisko,
+                               int numerTel,String mail, int kodPoczt, String ulica, int numerMiesz){
         if(DataSecurity.containIllegalSymbols(logi)) return -3;
         if(DataSecurity.containIllegalSymbols(haslo)) return -4;
 
         try {
-
+            con.setAutoCommit(false);
             Statement stmt;
             PreparedStatement ps = con.prepareStatement(SELECT_LOGIN_USER);
             ps.setString(1, logi);
@@ -1223,11 +1224,24 @@ else {
                 ps.setString(4,DataSecurity.getHashSHA512(haslo,DataSecurity.getSalt()));
                 ps.executeUpdate();
 
+                con.commit();
                 return 0;
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
+
+            try{
+                if(con!=null) con.rollback();
+                }catch (SQLException se){
+                    se.printStackTrace();
+                }
+        }finally{
+            try {
+                con.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return -1;
     }
