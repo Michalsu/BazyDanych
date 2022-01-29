@@ -84,7 +84,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if(!permission){
+                if(!(permission || login.getText().isEmpty() || password.getText().isEmpty())){
                     //if(login.getText().isEmpty() || password.getText().isEmpty())
                     boolean sendrequest=true;
                     if(DataSecurity.containIllegalSymbols(login.getText())){
@@ -445,11 +445,8 @@ class Client extends JFrame implements ActionListener, Runnable{
         try{
             while(true){
                 String message = (String)inputStream.readObject();
-                //if (message == "") return "ERROR NO ANSWER";
                 String[] substrings = message.split("#");
                 int parimeters = substrings.length;
-                int exCode = -1;
-                String response = "ERROR";
                 switch (substrings[0]) {
                     case "LOGIN":
                         //Adam#Haslo!123
