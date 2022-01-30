@@ -108,8 +108,11 @@ class Client extends JFrame implements ActionListener, Runnable{
                 //    cl.show(cards,CLIENTPANEL);
                    // pane.setSize(new Dimension(850,500));
 
-                sendMessage("SEARCH#");
-                while(categories.size()==0);
+                sendMessage("SEARCH#");int i=0;
+                while(categories.size()==0 && i < 10000){
+                    i++;
+                    System.out.println(i);
+                }
 
                 categoryList.setListData(categories);
 
@@ -309,6 +312,7 @@ class Client extends JFrame implements ActionListener, Runnable{
             @Override
             public void actionPerformed(ActionEvent e) {
                 //sendMessage("LOGOUT");
+                permission=false;
                 CardLayout cl = (CardLayout) (cards.getLayout());
                 cl.show(cards, LOGINPANEL);
                 pane.setSize(new Dimension(355, 300));
@@ -426,8 +430,6 @@ class Client extends JFrame implements ActionListener, Runnable{
                // while(temp == categories);
 
                 categoryList.setListData(categories);
-
-
             }
         });
 
