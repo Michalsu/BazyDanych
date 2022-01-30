@@ -396,6 +396,14 @@ class Client extends JFrame implements ActionListener, Runnable{
                 pane.setSize(new Dimension(200,400));
             }
         });
+        viewOrdersButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,VIEWOFORDERS);
+                pane.setSize(new Dimension(460,320));
+            }
+        });
 
 
 
@@ -661,6 +669,45 @@ class Client extends JFrame implements ActionListener, Runnable{
         dataOfClientLayout.add(backToMainPanelButton);
 
 
+        //layout podglądu zamówień
+        //Layout koszyka
+        JPanel clientOrdersLayout = new JPanel();
+        clientOrdersLayout.setLayout(null);
+
+//tutaj trzeba ściągnąć rzeczy w koszyku z bazy
+        DefaultListModel <String> rowOfOrdersData = new DefaultListModel <String>();
+
+        rowOfOrdersData.addElement("zamówienie 1");
+        rowOfOrdersData.addElement("zamówienie 2");
+
+        JButton backFromOrdersButton = new JButton("Powrót do sklepu");
+        JLabel ordersLabel = new JLabel("Zamówienia");
+
+
+        JList ordersOfClientsList = new JList(rowOfOrdersData);
+
+
+        ordersOfClientsList.setDragEnabled(false);
+        JScrollPane ordersScroll = new JScrollPane(ordersOfClientsList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        backFromOrdersButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,CLIENTPANEL);
+                pane.setSize(new Dimension(600,500));}
+
+        });
+        ordersLabel.setBounds(170,5,100,30);
+        ordersScroll.setBounds(10,40,400,200);
+        backFromOrdersButton.setBounds(150,245,150,30);
+
+        clientOrdersLayout.add(ordersLabel);
+        clientOrdersLayout.add(ordersScroll);
+        clientOrdersLayout.add(backFromOrdersButton);
+
+
 
         cards = new JPanel(new CardLayout());
         cards.add(loginLayout, LOGINPANEL);
@@ -669,6 +716,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         cards.add(cartLayout,CARTPANEL);
         cards.add(orderLayout, ORDERPANEL);
         cards.add(dataOfClientLayout,CLIENTDATAPANEL);
+        cards.add(clientOrdersLayout,VIEWOFORDERS);
         pane.add(cards, BorderLayout.CENTER);
 
 
