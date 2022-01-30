@@ -31,6 +31,7 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 
     static Vector<Product> produkty = new Vector<>();
+    static Vector<String> categories = new Vector<>();
     private static boolean permission;
     JPanel cards; //a panel that uses CardLayout
 
@@ -317,19 +318,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         JTextField countField = new JTextField();
 
 
-        //TODO
-        // ja tu tylko testuje searcha trzeba to naprawic
-        //-------------------------------------------------------------
 
-        addToCartButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendMessage("SEARCH#12");
-            }
-        });
-
-
-        //------------------------------------------------------------
 
 
         //Panel użykownika
@@ -338,8 +327,24 @@ class Client extends JFrame implements ActionListener, Runnable{
         JButton viewOrdersButton = new JButton("Wyświetl zamówienia");
         JButton dataButton = new JButton("Wyświetl dane");
         JButton logoutButton = new JButton("Wyloguj");
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //sendMessage("LOGOUT");
+                System.out.println("test1");
+                CardLayout cl = (CardLayout) (cards.getLayout());
+                cl.show(cards, LOGINPANEL);
+                pane.setSize(new Dimension(355, 300));
+            }
+        });
+
         JButton searchButton = new JButton("Szukaj");
         JTextField searchField = new JTextField();
+
+
+
+
+
 
 
         //TODO
@@ -389,6 +394,18 @@ class Client extends JFrame implements ActionListener, Runnable{
             }
         });
 
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendMessage("SEARCH#"+DataSecurity.sanitizeInput(searchField.getText()).replace("#",""));
+                Vector<String> temp = categories;
+                while(temp == categories);
+//                for(int i=0; i<produkty.size();i++){
+//                    column.addElement(String.valueOf(produkty.get(i)));
+//                }
+
+            }
+        });
 
 
 /*
@@ -774,11 +791,17 @@ class Client extends JFrame implements ActionListener, Runnable{
 
                     case "SEARCH":
                         int ilosc= Integer.parseInt(substrings[1]);
-                        produkty = new Vector<Product>();
+                        produkty.clear();
+                        categories.clear();
                         for(int i =0;i<ilosc;i++){
                             produkty.add(new Product(Integer.parseInt(substrings[6*i+7]), substrings[6*i+4], substrings[6*i+5], Float.parseFloat(substrings[6*i+2]), Integer.parseInt(substrings[6*i+3]), substrings[6*i+6]));
+                            if(!categories.contains(substrings[6*i+6])){
+                                categories.add(substrings[6*i+6]);
+                            }
                         }
+
                         System.out.println(produkty);
+                        System.out.println(categories);
 
                         break;
                 }
