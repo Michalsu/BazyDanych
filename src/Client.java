@@ -27,6 +27,7 @@ class Client extends JFrame implements ActionListener, Runnable{
     final static String REGISTERPANEL = "Register layout";
     final static String CLIENTPANEL = "Client panel layout";
     final static String CARTPANEL = "Cart layout";
+    final static String ORDERPANEL = "Order layout";
 
 
     static Vector<Product> produkty = new Vector<>();
@@ -288,11 +289,11 @@ class Client extends JFrame implements ActionListener, Runnable{
         //tutaj trzeba wczytać poszczególne przedmioty z bazy danych i ich opisy
         Vector<Pair<DefaultListModel,DefaultListModel>> vectOfItemsByCategory= new Vector<Pair<DefaultListModel,DefaultListModel>>();
 
+
         for (int i = 0;i<20;i++) {
+            String desc  = null;
             DefaultListModel listOfItems = new DefaultListModel();
             DefaultListModel listOfItemsDesc = new DefaultListModel();
-
-            String desc  = null;
             for (int j = 0; j < 40; j++) {
                 String temp = "Przedmiot" + i;
                  desc  = "Opis" + i;
@@ -337,6 +338,8 @@ class Client extends JFrame implements ActionListener, Runnable{
         JButton viewOrdersButton = new JButton("Wyświetl zamówienia");
         JButton dataButton = new JButton("Wyświetl dane");
         JButton logoutButton = new JButton("Wyloguj");
+        JButton searchButton = new JButton("Szukaj");
+        JTextField searchField = new JTextField();
 
 
         //TODO
@@ -348,6 +351,9 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 
         JScrollPane itemScroll = new JScrollPane(itemsList,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        JScrollPane categoryScroll = new JScrollPane(categoryList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 
@@ -363,7 +369,6 @@ class Client extends JFrame implements ActionListener, Runnable{
                 }
 
         });
-
       //aktualziacja opisu dla wybranego przedmiotu
         itemsList.addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -380,27 +385,46 @@ class Client extends JFrame implements ActionListener, Runnable{
             public void actionPerformed(ActionEvent actionEvent) {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,CARTPANEL);
-                pane.setSize(450,320);
+                pane.setSize(new Dimension(460,320));
             }
         });
 
 
-       JScrollPane categoryScroll = new JScrollPane(categoryList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
+/*
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                String searchingItem = searchField.getText();
+                System.out.println(listOfItems.get(0));
 
+                Vector<String> temp = new Vector<>();
+                for (int i = 0; i< listOfItems.size(); i++)
+                        if(listOfItems.get(i).equals(searchingItem)) {
+                            itemsList.clearSelection();
+                            temp.add(searchingItem);
+                            itemsList.setListData(temp);
+                        }
+            }
+        });
+
+*/
         categoryLabel.setBounds(10,10,80,30);
         categoryScroll.setBounds(10,40,150,vect.size()*10);
         itemsLabel.setBounds(180,10,80,30);
         itemScroll.setBounds(180,40,200,vect.size()*10);
-        itemsDescrition.setBounds(10,270,350,100);
-        countLabel.setBounds(10,380,40,30);
-        countField.setBounds(45,380,50,30);
-        addToCartButton.setBounds(100,380, 200,30);
+        searchField.setBounds(10,250,120,30);
+        searchButton.setBounds(140,250,80,30);
+        itemsDescrition.setBounds(10,290,350,100);
+        countLabel.setBounds(10,400,40,30);
+        countField.setBounds(45,400,50,30);
+        addToCartButton.setBounds(100,400, 200,30);
         viewCartButton.setBounds(400,40, 130,30);
         viewOrdersButton.setBounds(400,75, 130,30);
         dataButton.setBounds(400,110, 130,30);
         logoutButton.setBounds(400,145, 130,30);
+
+
 
         panelLayout.add(categoryLabel);
         panelLayout.add(itemsLabel);
@@ -414,7 +438,8 @@ class Client extends JFrame implements ActionListener, Runnable{
         panelLayout.add(viewOrdersButton);
         panelLayout.add(dataButton);
         panelLayout.add(logoutButton);
-
+        panelLayout.add(searchButton);
+        panelLayout.add(searchField);
         panelLayout.setLayout(null);
 
 //Layout koszyka
@@ -445,6 +470,8 @@ class Client extends JFrame implements ActionListener, Runnable{
 
         JTable itemsInCartList = new JTable(rowData,column);
 
+        itemsInCartList.setDragEnabled(false);
+        itemsInCartList.setDefaultEditor(Object.class, null);
 
         deleteFromCartButton.addActionListener(new ActionListener() {
             @Override
@@ -466,8 +493,25 @@ class Client extends JFrame implements ActionListener, Runnable{
             }
         });
 
+        orderButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+                if(itemsInCartList.getRowCount()!=0) {
+                    CardLayout cl = (CardLayout) (cards.getLayout());
+                    cl.show(cards, ORDERPANEL);
+                    pane.setSize(new Dimension(280, 300));
+                }
+                else
+                    JOptionPane.showMessageDialog(null,"Koszyk jest pusty");
+            }
+        });
+
+
+
         JScrollPane cartScroll = new JScrollPane(itemsInCartList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
 
 
         cartScroll.setBounds(10,10,430,200);
@@ -483,7 +527,61 @@ class Client extends JFrame implements ActionListener, Runnable{
         cartLayout.add(backButton);
         cartLayout.add(deleteFromCartButton);
 
+        //Layout zamówienia
 
+        JPanel orderLayout = new JPanel();
+
+        orderLayout.setLayout(null);
+
+
+
+        JButton backToCartButton = new JButton("Powrót do koszyka");
+        JButton confirmOrderButton = new JButton("Potwierdź zamówienie");
+        JLabel  chooseDeliveryField = new JLabel("Wybierz sposób dostawy");
+        JLabel  choosePayingField = new JLabel("Wybierz sposób płatności");
+
+
+        String arr1[] = { "Przelew", "Blik", "Karta kredytowa" };
+        String arr2[] = { "Paczkomat", "Kurier", "Odbiór osobisty" };
+
+        JComboBox chooseDeliveryBox = new JComboBox(arr1);
+        JComboBox choosePayingBox = new JComboBox(arr2);
+
+
+        backToCartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,CARTPANEL);
+                pane.setSize(new Dimension(460,320));
+            }
+        });
+
+                //tutaj trzeba wysłać zamówienie na serwer
+        confirmOrderButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,CLIENTPANEL);
+                pane.setSize(new Dimension(600,500));
+
+            }
+        });
+
+
+        chooseDeliveryField.setBounds(60,20,150,30);
+        chooseDeliveryBox.setBounds(90,55,100,30);
+        choosePayingField.setBounds(60,90,150,30);
+        choosePayingBox.setBounds(90,125,100,30);
+        backToCartButton.setBounds(50,170,180,30);
+        confirmOrderButton.setBounds(50,210,180,30);
+
+        orderLayout.add(chooseDeliveryField);
+        orderLayout.add(chooseDeliveryBox);
+        orderLayout.add(choosePayingField);
+        orderLayout.add(choosePayingBox);
+        orderLayout.add(backToCartButton);
+        orderLayout.add(confirmOrderButton);
 
 
         //dodawanie widoków do ramki
@@ -492,6 +590,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         cards.add(RegisterLayout, REGISTERPANEL);
         cards.add(panelLayout,CLIENTPANEL);
         cards.add(cartLayout,CARTPANEL);
+        cards.add(orderLayout, ORDERPANEL);
         pane.add(cards, BorderLayout.CENTER);
 
 
