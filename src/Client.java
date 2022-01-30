@@ -615,6 +615,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         clientData.add("Dane");
         clientData.add("Dane");
         clientData.add("Dane");
+
         clientData.add("Dane");
         clientData.add("Dane");
 
