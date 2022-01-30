@@ -15,6 +15,8 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 
 class Client extends JFrame implements ActionListener, Runnable{
@@ -378,7 +380,7 @@ class Client extends JFrame implements ActionListener, Runnable{
             public void actionPerformed(ActionEvent actionEvent) {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,CARTPANEL);
-
+                pane.setSize(450,320);
             }
         });
 
@@ -420,27 +422,66 @@ class Client extends JFrame implements ActionListener, Runnable{
         cartLayout.setLayout(null);
 
 //tutaj trzeba ściągnąć rzeczy w koszyku z bazy
-        Vector<Vector<String>> data = new Vector<>();
-       // data.addElement(new Vector<>("przedmiot1","1"));
-       // listOfItemsFromBase.addElement(new Pair<>("przedmiot2",2));
+        Vector<Vector> rowData = new Vector<Vector>();
+        Vector<String> column = new Vector<>();
+        //wektor na przedmioty
+        Vector<String> vec = new Vector<>();
+        vec.add("Przedmiot1");
+        vec.add("Ilość1");
+
+        rowData.add(vec);
 
         JButton backButton = new JButton("Powrót do sklepu");
+        JButton deleteFromCartButton = new JButton("Usuń z koszyka");
         JButton orderButton = new JButton("Zamów");
-        JLabel priceOfCart = new JLabel();
-
-        String[] columnNames = { "Przedmiot","Ilość" };
-
-      //  JTable itemsInCartList = new JTable(, columnNames);
+        //tutaj trzeba wpisać pobraną cenę
+        JLabel priceOfCart = new JLabel("Cena");
 
 
 
-   //     JScrollPane cartScroll = new JScrollPane(itemsInCartList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-           //     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        column.addElement("Przedmiot");
+        column.addElement("Ilość");
 
 
+        JTable itemsInCartList = new JTable(rowData,column);
 
-    //    cartLayout.add(cartScroll);
 
+        deleteFromCartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                DefaultTableModel model = (DefaultTableModel) itemsInCartList.getModel();
+                int[] rows = itemsInCartList.getSelectedRows();
+                for(int i=0;i<rows.length;i++){
+                    model.removeRow(rows[i]-i);
+
+            }}
+        });
+
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,CLIENTPANEL);
+                pane.setSize(new Dimension(600,500));
+            }
+        });
+
+        JScrollPane cartScroll = new JScrollPane(itemsInCartList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+
+        cartScroll.setBounds(10,10,430,200);
+        priceOfCart.setBounds(10,210,80,30);
+        deleteFromCartButton.setBounds(10,240,180,30);
+        orderButton.setBounds(195,240,80,30);
+        backButton.setBounds(280,240,150,30);
+
+
+        cartLayout.add(cartScroll);
+        cartLayout.add(priceOfCart);
+        cartLayout.add(orderButton);
+        cartLayout.add(backButton);
+        cartLayout.add(deleteFromCartButton);
 
 
 
