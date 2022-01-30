@@ -156,8 +156,6 @@ public class Request {
                 }
                 updatePrice(koszyk_id,con);
 
-
-
                 break;
             case "DELETEFROMCART":
                 sb = new StringBuilder();
@@ -174,12 +172,10 @@ public class Request {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-
                 deleteFromCart(Integer.parseInt(substrings[2]),koszyk_id,con);
                 break;
             case "BUY":
                 boolean ifEmpty = false;
-
 
                 sb = new StringBuilder();
                 sb.append("START TRANSACTION;");
@@ -240,6 +236,7 @@ public class Request {
                             unavailableListOfProducts.remove(i);
                             i++;
                         }
+                        response = "Brak przedmiotów w magazynie";
                     }
 
 
@@ -310,6 +307,7 @@ public class Request {
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
+                        response = "OK";
                     }
 
 
@@ -334,6 +332,7 @@ public class Request {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
+
                 }
 
                 break;

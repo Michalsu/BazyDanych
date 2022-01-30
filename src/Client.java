@@ -28,7 +28,6 @@ class Client extends JFrame implements ActionListener, Runnable{
     final static String CLIENTPANEL = "Client panel layout";
     final static String CARTPANEL = "Cart layout";
     final static String ORDERPANEL = "Order layout";
-    final static String CLIENTDATAPANEL = "Data of client layout";
     final static String VIEWOFORDERS = "View of client orders layout";
     static Vector<Product> produkty = new Vector<>();
     static Vector<String> categories = new Vector<>();
@@ -295,7 +294,6 @@ class Client extends JFrame implements ActionListener, Runnable{
 
         JButton viewCartButton = new JButton("Wyświetl koszyk");
         JButton viewOrdersButton = new JButton("Zamówienia");
-        JButton dataButton = new JButton("Wyświetl dane");
         JButton logoutButton = new JButton("Wyloguj");
         logoutButton.addActionListener(new ActionListener() {
             @Override
@@ -362,14 +360,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                 pane.setSize(new Dimension(460,320));
             }
         });
-        dataButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                CardLayout cl = (CardLayout)(cards.getLayout());
-                cl.show(cards,CLIENTDATAPANEL);
-                pane.setSize(new Dimension(200,400));
-            }
-        });
+
         viewOrdersButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -456,7 +447,6 @@ class Client extends JFrame implements ActionListener, Runnable{
         addToCartButton.setBounds(100,400, 200,30);
         viewCartButton.setBounds(400,40, 130,30);
         viewOrdersButton.setBounds(400,75, 130,30);
-        dataButton.setBounds(400,110, 130,30);
         logoutButton.setBounds(400,145, 130,30);
 
 
@@ -471,7 +461,6 @@ class Client extends JFrame implements ActionListener, Runnable{
         panelLayout.add(addToCartButton);
         panelLayout.add(viewCartButton);
         panelLayout.add(viewOrdersButton);
-        panelLayout.add(dataButton);
         panelLayout.add(logoutButton);
         panelLayout.add(searchButton);
         panelLayout.add(searchField);
@@ -524,7 +513,7 @@ class Client extends JFrame implements ActionListener, Runnable{
             public void actionPerformed(ActionEvent actionEvent) {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,CLIENTPANEL);
-                pane.setSize(new Dimension(600,500));
+                pane.setSize(new Dimension(850,500));
             }
         });
 
@@ -598,7 +587,7 @@ class Client extends JFrame implements ActionListener, Runnable{
             public void actionPerformed(ActionEvent actionEvent) {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,CLIENTPANEL);
-                pane.setSize(new Dimension(600,500));
+                pane.setSize(new Dimension(850,500));
 
             }
         });
@@ -619,76 +608,10 @@ class Client extends JFrame implements ActionListener, Runnable{
         orderLayout.add(confirmOrderButton);
 
 
-        //layout danych klienta
-        JPanel dataOfClientLayout = new JPanel();
-        dataOfClientLayout.setLayout(null);
 
-        JLabel dataField = new JLabel("Dane osobowe");
-        JLabel nameOfClientField = new JLabel();
-        JLabel surnameOfClientField = new JLabel();
-        JLabel phoneOfClientField = new JLabel();
-        JLabel mailOfClientField = new JLabel();
-        JLabel addressOfClientField = new JLabel("Adres");
-        JLabel postCodeOfClientField = new JLabel();
-        JLabel streetOfClientField = new JLabel();
-        JLabel homeNumberOfClientField = new JLabel();
-        JButton backToMainPanelButton = new JButton("Powrót");
-
-        //wektor na dane osobowe
-        Vector<String> clientData = new Vector<>();
-        clientData.add("Dane");
-        clientData.add("Dane");
-        clientData.add("Dane");
-        clientData.add("Dane");
-        clientData.add("Dane");
-
-        clientData.add("Dane");
-        clientData.add("Dane");
-
-        nameOfClientField.setText("Imię: "+ clientData.get(0));
-        surnameOfClientField.setText("Nazwisko: "+ clientData.get(1));
-        phoneOfClientField.setText("Telefon: "+ clientData.get(2));
-        mailOfClientField.setText("Mail: "+ clientData.get(3));
-        postCodeOfClientField.setText("Kod pocztowy: "+ clientData.get(4));
-        streetOfClientField.setText("Ulica: "+ clientData.get(5));
-        homeNumberOfClientField.setText("Numer domu: "+ clientData.get(6));
-
-        dataField.setBounds(30,10,100,30);
-        nameOfClientField.setBounds(30,45,120,30);
-        surnameOfClientField.setBounds(30,80,120,30);
-        phoneOfClientField.setBounds(30,115,120,30);
-        mailOfClientField.setBounds(30,150,120,30);;
-        addressOfClientField.setBounds(30,185,50,30);
-        postCodeOfClientField.setBounds(30,220,120,30);
-        streetOfClientField.setBounds(30,255,120,30);
-        homeNumberOfClientField.setBounds(30,290,120,30);
-        backToMainPanelButton.setBounds(30,325,120,30);
-
-
-        backToMainPanelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                CardLayout cl = (CardLayout)(cards.getLayout());
-                cl.show(cards,CLIENTPANEL);
-                pane.setSize(new Dimension(600,500));}
-
-        });
-
-
-        dataOfClientLayout.add(dataField);
-        dataOfClientLayout.add(nameOfClientField);
-        dataOfClientLayout.add(surnameOfClientField);
-        dataOfClientLayout.add(phoneOfClientField);
-        dataOfClientLayout.add(mailOfClientField);
-        dataOfClientLayout.add(addressOfClientField);
-        dataOfClientLayout.add(postCodeOfClientField);
-        dataOfClientLayout.add(streetOfClientField);
-        dataOfClientLayout.add(homeNumberOfClientField);
-        dataOfClientLayout.add(backToMainPanelButton);
 
 
         //layout podglądu zamówień
-        //Layout koszyka
         JPanel clientOrdersLayout = new JPanel();
         clientOrdersLayout.setLayout(null);
 
@@ -714,7 +637,8 @@ class Client extends JFrame implements ActionListener, Runnable{
             public void actionPerformed(ActionEvent actionEvent) {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,CLIENTPANEL);
-                pane.setSize(new Dimension(600,500));}
+                pane.setSize(new Dimension(850,500));
+            }
 
         });
         ordersLabel.setBounds(170,5,100,30);
@@ -733,7 +657,6 @@ class Client extends JFrame implements ActionListener, Runnable{
         cards.add(panelLayout,CLIENTPANEL);
         cards.add(cartLayout,CARTPANEL);
         cards.add(orderLayout, ORDERPANEL);
-        cards.add(dataOfClientLayout,CLIENTDATAPANEL);
         cards.add(clientOrdersLayout,VIEWOFORDERS);
         pane.add(cards, BorderLayout.CENTER);
 
@@ -897,7 +820,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                             setPermission(true);
                             CardLayout cl = (CardLayout)(cards.getLayout());
                             cl.show(cards,CLIENTPANEL);
-                            this.setSize(new Dimension(600,500));
+                            this.setSize(new Dimension(850,500));
                         }
 
                         else if(substrings[1].equals("WRONGPASS"))
