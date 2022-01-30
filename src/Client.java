@@ -111,7 +111,6 @@ class Client extends JFrame implements ActionListener, Runnable{
                 sendMessage("SEARCH#");int i=0;
                 while(categories.size()==0 && i < 10000){
                     i++;
-                    System.out.println(i);
                 }
 
                 categoryList.setListData(categories);
