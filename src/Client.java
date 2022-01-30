@@ -315,19 +315,14 @@ class Client extends JFrame implements ActionListener, Runnable{
                 CardLayout cl = (CardLayout) (cards.getLayout());
                 cl.show(cards, LOGINPANEL);
                 pane.setSize(new Dimension(355, 300));
+                login.setText("");
+                password.setText("");
             }
         });
 
         JButton searchButton = new JButton("Szukaj");
         JTextField searchField = new JTextField();
 
-
-
-
-        //TODO
-        // tu tez sobie testuje searcha
-        // było
-        // JList itemsList =  new JList(vect);
 
         JList itemsList = new JList();
 
@@ -423,7 +418,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sendMessage("SEARCH#"+DataSecurity.sanitizeInput(searchField.getText()).replace("#",""));
+                sendMessage("SEARCH#"+DataSecurity.sanitizeInput(searchField.getText()).replace("#","").replace(" ","#"));
                 Vector<String> temp = categories;
                 System.out.println(categories);
                // while(temp == categories);
@@ -518,8 +513,11 @@ class Client extends JFrame implements ActionListener, Runnable{
             public void actionPerformed(ActionEvent e) {
                 //TODO
                 // oczytanie wybranego elementu z listy/tablicy
+
+
+                int id = Integer.parseInt((String) itemsTable.getValueAt(itemsTable.getSelectedRow(),0));
+               // System.out.println(id);
                 int count=0;
-                int odczytane_id=3;
                 int odczytana_ilosc_produktu=5;
                 try{
                     count = Integer.parseInt(countField.getText());
@@ -529,7 +527,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                     count = -1;
                 }
                 if(count>=1 && count<=odczytana_ilosc_produktu){
-                    sendMessage("ADDTOCART#"+login.getText()+"#"+odczytane_id+"#"+count);
+                    sendMessage("ADDTOCART#"+login.getText()+"#"+id+"#"+count);
                 }else JOptionPane.showMessageDialog(null, "Podano nieprawidłową ilość towaru");
 
             }
@@ -887,23 +885,11 @@ class Client extends JFrame implements ActionListener, Runnable{
                                 categories.add(substrings[6*i+6]);
                             }
                         }
-
-                     //   System.out.println(produkty);
-
+                        break;
+                    default:
+                        JOptionPane.showMessageDialog(null,"Komunikat z serwera "+message);
                         break;
                 }
-//                String[] actualValue = message.split("#");
-//                System.out.println(permission);
-//                printReceivedMessage(message);
-//                if(actualValue[0].equals("LOGIN"))
-//                {
-//                    if
-//                   setPermission(true);
-//
-//                    System.out.println(permission);
-//                }
-
-
             }
         } catch(Exception e){
             JOptionPane.showMessageDialog(null, "Polaczenie sieciowe dla klienta zostalo przerwane");
@@ -911,15 +897,4 @@ class Client extends JFrame implements ActionListener, Runnable{
             dispose();
         }
     }
-
-
-    public int loginRequest(String req){
-
-        String response = null;
-        if(response =="LOGIN#SUCCESSFUL") return 0;
-        if(response =="LOGIN#WRONGPASS") return -1;
-        if(response =="LOGIN#WRONGNAME") return -2;
-        else return Integer.parseInt(response.replace("LOGIN#ERROR: ",""));
-    }
-
 }
