@@ -41,7 +41,7 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 
     public void addComponentToPane(JFrame pane) {
-
+        JList categoryList =  new JList();
         //layout startowy
         JPanel loginLayout = new JPanel();
         loginLayout.setLayout(null);
@@ -103,6 +103,16 @@ class Client extends JFrame implements ActionListener, Runnable{
                         sendMessage(sb.toString());
                     }else JOptionPane.showMessageDialog(null, combinedMessage.toString());
                 }else JOptionPane.showMessageDialog(null, "Musisz wprowadzić dane logowania");
+
+                    CardLayout cl = (CardLayout)(cards.getLayout());
+                    cl.show(cards,CLIENTPANEL);
+                    pane.setSize(new Dimension(850,500));
+
+                sendMessage("SEARCH#");
+                while(categories.size()==0);
+
+                categoryList.setListData(categories);
+
             }
         });
 
@@ -311,18 +321,35 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 
 
-
-
-
         //TODO
         // tu tez sobie testuje searcha
         // było
         // JList itemsList =  new JList(vect);
-        JList categoryList =  new JList();
+
         JList itemsList = new JList();
 
 
-        JScrollPane itemScroll = new JScrollPane(itemsList,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+        DefaultTableModel model = new DefaultTableModel();
+        JTable itemsTable = new JTable(model);
+
+        model.addColumn("Produkt");
+        model.addColumn("Nazwa");
+        model.addColumn("Cena");
+        model.addColumn("Promocja");
+
+        itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        itemsTable.getColumnModel().getColumn(0).setMinWidth(80);
+        itemsTable.getColumnModel().getColumn(1).setMinWidth(155);
+        itemsTable.getColumnModel().getColumn(2).setMinWidth(50);
+        itemsTable.getColumnModel().getColumn(3).setMinWidth(30);
+
+
+
+
+
+        itemsTable.setDragEnabled(false);
+        itemsTable.setDefaultEditor(Object.class, null);
+        JScrollPane itemScroll = new JScrollPane(itemsTable,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         JScrollPane categoryScroll = new JScrollPane(categoryList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
@@ -332,25 +359,39 @@ class Client extends JFrame implements ActionListener, Runnable{
         itemsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         categoryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //aktualiacja przedmiotów dla wybranej listy
+
         categoryList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
+                model.setRowCount(0);
                 if(!e.getValueIsAdjusting())
-                itemsList.setModel(vectOfItemsByCategory.get(categoryList.getSelectedIndex()).getL());
-                itemsList.setSelectedIndex(0);
+                    for(int i = 0 ; i < produkty.size();i++)
+                    if(produkty.get(i).kategoria.equals(categoryList.getSelectedValue().toString())) {
+                        Vector<String> temp = new Vector<>();
+                        temp.add(String.valueOf(produkty.get(i).ID));
+                        temp.add(produkty.get(i).nazwa);
+                        temp.add(String.valueOf(produkty.get(i).cena));
+                        temp.add(String.valueOf(produkty.get(i).promocja));
+                        model.addRow(temp);
+                    }
+               if(model.getRowCount()!=0)
+               itemsTable.setRowSelectionInterval(0, 0);
                 }
 
         });
-      //aktualziacja opisu dla wybranego przedmiotu
-        itemsList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
+      //aktualziacja opisu dla wybranego przedmiotu?8
 
-                    if(itemsList.getSelectedIndex()!=-1)
-                    itemsDescrition.setText((String) vectOfItemsByCategory.get(categoryList.getSelectedIndex()).getR().get(itemsList.getSelectedIndex()));
+        itemsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+            public void valueChanged(ListSelectionEvent event) {
+
+                //   int productId = Integer.parseInt((String) itemsTable.getValueAt(itemsTable.getSelectedRow(),0));
+
+//
+             // for(int i =0;i<produkty.size();i++)
+               //    if(produkty.get(i).ID == productId)
+                 //      itemsDescrition.setText(produkty.get(i).opis);
 
             }
-
         });
         viewCartButton.addActionListener(new ActionListener() {
             @Override
@@ -370,28 +411,14 @@ class Client extends JFrame implements ActionListener, Runnable{
             }
         });
 
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                System.out.println(permission);
-                if(permission){
-                    CardLayout cl = (CardLayout)(cards.getLayout());
-                    cl.show(cards,CLIENTPANEL);
-                    pane.setSize(new Dimension(600,500));
-                }
-                sendMessage("SEARCH#");
-                categoryList.setListData(categories);
-                categoryList.updateUI();
 
-            }
-        });
-
+        itemsDescrition.setEnabled(false);
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendMessage("SEARCH#"+DataSecurity.sanitizeInput(searchField.getText()).replace("#",""));
                 Vector<String> temp = categories;
-                while(temp == categories);
+               // while(temp == categories);
 //                for(int i=0; i<produkty.size();i++){
 //                    column.addElement(String.valueOf(produkty.get(i)));
 //                }
@@ -404,7 +431,7 @@ class Client extends JFrame implements ActionListener, Runnable{
 
                             listOfItems.addElement(produkty.get(j).nazwa);
 
-                            listOfItemsDesc.addElement("null");
+                            listOfItemsDesc.addElement(produkty.get(j).nazwa);
                         }
 
                     }
@@ -412,6 +439,7 @@ class Client extends JFrame implements ActionListener, Runnable{
 
                 }
                 categoryList.setListData(categories);
+
 
             }
         });
@@ -438,16 +466,16 @@ class Client extends JFrame implements ActionListener, Runnable{
         categoryLabel.setBounds(10,10,80,30);
         categoryScroll.setBounds(10,40,150,180);
         itemsLabel.setBounds(180,10,80,30);
-        itemScroll.setBounds(180,40,200,180);
+        itemScroll.setBounds(180,40,400,180);
         searchField.setBounds(10,250,120,30);
         searchButton.setBounds(140,250,80,30);
         itemsDescrition.setBounds(10,290,350,100);
         countLabel.setBounds(10,400,40,30);
         countField.setBounds(45,400,50,30);
         addToCartButton.setBounds(100,400, 200,30);
-        viewCartButton.setBounds(400,40, 130,30);
-        viewOrdersButton.setBounds(400,75, 130,30);
-        logoutButton.setBounds(400,145, 130,30);
+        viewCartButton.setBounds(600,40, 130,30);
+        viewOrdersButton.setBounds(600,75, 130,30);
+        logoutButton.setBounds(600,110, 130,30);
 
 
 
