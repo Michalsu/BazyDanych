@@ -104,9 +104,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                     }else JOptionPane.showMessageDialog(null, combinedMessage.toString());
                 }else JOptionPane.showMessageDialog(null, "Musisz wprowadzić dane logowania");
 
-                    CardLayout cl = (CardLayout)(cards.getLayout());
-                    cl.show(cards,CLIENTPANEL);
-                    pane.setSize(new Dimension(850,500));
+
 
                 sendMessage("SEARCH#");
                 while(categories.size()==0);
@@ -277,12 +275,6 @@ class Client extends JFrame implements ActionListener, Runnable{
         //layout panelu użytkownika
         JPanel panelLayout = new JPanel();
 
-        //wektor na kategorie, wczytane z bazy
-
-
-        //vector na listy przedmiotów z każdej kategorii
-        //tutaj trzeba wczytać poszczególne przedmioty z bazy danych i ich opisy
-        Vector<Pair<DefaultListModel,DefaultListModel>> vectOfItemsByCategory= new Vector<Pair<DefaultListModel,DefaultListModel>>();
 
 
 
@@ -290,7 +282,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         JLabel itemsLabel = new JLabel("Przedmioty");
         //miejsce na opis przedmiotu
         JTextArea itemsDescrition = new JTextArea();
-
+        itemsDescrition.setDisabledTextColor(Color.BLACK);
 
         JButton addToCartButton = new JButton("Dodaj do koszyka");
         JLabel countLabel = new JLabel("Ilość");
@@ -384,12 +376,14 @@ class Client extends JFrame implements ActionListener, Runnable{
         itemsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
             public void valueChanged(ListSelectionEvent event) {
 
-                //   int productId = Integer.parseInt((String) itemsTable.getValueAt(itemsTable.getSelectedRow(),0));
+                int productId = -1;
+                if(itemsTable.getSelectedRow()!=-1)
+                    productId = Integer.parseInt((String) itemsTable.getValueAt(itemsTable.getSelectedRow(),0));
 
 //
-             // for(int i =0;i<produkty.size();i++)
-               //    if(produkty.get(i).ID == productId)
-                 //      itemsDescrition.setText(produkty.get(i).opis);
+              for(int i =0;i<produkty.size();i++)
+                   if(produkty.get(i).ID == productId)
+                             itemsDescrition.setText(produkty.get(i).opis);
 
             }
         });
@@ -438,7 +432,6 @@ class Client extends JFrame implements ActionListener, Runnable{
                         }
 
                     }
-                    vectOfItemsByCategory.addElement(new Pair<>(listOfItems,listOfItemsDesc));
 
                 }
                 categoryList.setListData(categories);
