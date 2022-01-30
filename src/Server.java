@@ -240,6 +240,17 @@ class ClientThread implements Runnable {
                     socket.close();
                     socket=null;
                 }
+                else if (message.contains("LOGIN"))
+                {
+
+                    String[] substrings = message.split("#");
+                    String login= substrings[1];
+                    answ=Request.parseRequest(message , con);
+                    if(answ.equals("LOGIN#SUCCESSFUL")){
+                        this.login=login;
+                    }
+                    sendMessage(answ);
+                }
                 else
                 {
 

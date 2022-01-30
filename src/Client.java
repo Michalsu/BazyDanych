@@ -66,18 +66,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         passwordLabel.setBounds(50,100,40,30);
 
 
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                System.out.println(permission);
-                if(permission){
-                    CardLayout cl = (CardLayout)(cards.getLayout());
-                     cl.show(cards,CLIENTPANEL);
-                      pane.setSize(new Dimension(600,500));
-                }
 
-            }
-        });
 
         registerButton.addActionListener(new ActionListener() {
             @Override
@@ -280,31 +269,12 @@ class Client extends JFrame implements ActionListener, Runnable{
         JPanel panelLayout = new JPanel();
 
         //wektor na kategorie, wczytane z bazy
-        Vector<String> vect = new Vector<>();
-        for (int i = 0;i<20;i++) {
-            String temp = "kategoria" + i;
-             vect.add(temp);
-        }
+
 
         //vector na listy przedmiotów z każdej kategorii
         //tutaj trzeba wczytać poszczególne przedmioty z bazy danych i ich opisy
         Vector<Pair<DefaultListModel,DefaultListModel>> vectOfItemsByCategory= new Vector<Pair<DefaultListModel,DefaultListModel>>();
 
-
-        for (int i = 0;i<20;i++) {
-            String desc  = null;
-            DefaultListModel listOfItems = new DefaultListModel();
-            DefaultListModel listOfItemsDesc = new DefaultListModel();
-            for (int j = 0; j < 40; j++) {
-                String temp = "Przedmiot" + i;
-                 desc  = "Opis" + i;
-                listOfItems.addElement(temp);
-                listOfItemsDesc.addElement(desc);
-
-            }
-            vectOfItemsByCategory.addElement(new Pair<>(listOfItems,listOfItemsDesc));
-
-        }
 
 
         JLabel categoryLabel = new JLabel("Kategoria");
@@ -327,11 +297,10 @@ class Client extends JFrame implements ActionListener, Runnable{
         JButton viewOrdersButton = new JButton("Zamówienia");
         JButton dataButton = new JButton("Wyświetl dane");
         JButton logoutButton = new JButton("Wyloguj");
-        loginButton.addActionListener(new ActionListener() {
+        logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //sendMessage("LOGOUT");
-                System.out.println("test1");
                 CardLayout cl = (CardLayout) (cards.getLayout());
                 cl.show(cards, LOGINPANEL);
                 pane.setSize(new Dimension(355, 300));
@@ -351,8 +320,8 @@ class Client extends JFrame implements ActionListener, Runnable{
         // tu tez sobie testuje searcha
         // było
         // JList itemsList =  new JList(vect);
-        JList categoryList =  new JList(vect);
-        JList itemsList = new JList(produkty);
+        JList categoryList =  new JList();
+        JList itemsList = new JList();
 
 
         JScrollPane itemScroll = new JScrollPane(itemsList,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
@@ -410,6 +379,21 @@ class Client extends JFrame implements ActionListener, Runnable{
             }
         });
 
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                System.out.println(permission);
+                if(permission){
+                    CardLayout cl = (CardLayout)(cards.getLayout());
+                    cl.show(cards,CLIENTPANEL);
+                    pane.setSize(new Dimension(600,500));
+                }
+                sendMessage("SEARCH#");
+                categoryList.setListData(categories);
+                categoryList.updateUI();
+
+            }
+        });
 
         searchButton.addActionListener(new ActionListener() {
             @Override
@@ -420,6 +404,23 @@ class Client extends JFrame implements ActionListener, Runnable{
 //                for(int i=0; i<produkty.size();i++){
 //                    column.addElement(String.valueOf(produkty.get(i)));
 //                }
+
+                for (int i = 0;i<categories.size();i++) {
+                    DefaultListModel listOfItems = new DefaultListModel();
+                    DefaultListModel listOfItemsDesc = new DefaultListModel();
+                    for (int j = 0; j < produkty.size(); j++) {
+                        if(produkty.get(j).kategoria.equals(categories.get(i))){
+
+                            listOfItems.addElement(produkty.get(j).nazwa);
+
+                            listOfItemsDesc.addElement("null");
+                        }
+
+                    }
+                    vectOfItemsByCategory.addElement(new Pair<>(listOfItems,listOfItemsDesc));
+
+                }
+                categoryList.setListData(categories);
 
             }
         });
@@ -444,9 +445,9 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 */
         categoryLabel.setBounds(10,10,80,30);
-        categoryScroll.setBounds(10,40,150,vect.size()*10);
+        categoryScroll.setBounds(10,40,150,180);
         itemsLabel.setBounds(180,10,80,30);
-        itemScroll.setBounds(180,40,200,vect.size()*10);
+        itemScroll.setBounds(180,40,200,180);
         searchField.setBounds(10,250,120,30);
         searchButton.setBounds(140,250,80,30);
         itemsDescrition.setBounds(10,290,350,100);
@@ -918,7 +919,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                     case "SEARCH":
                         int ilosc= Integer.parseInt(substrings[1]);
                         produkty.clear();
-                        categories.clear();
+                        categories= new Vector<String>();
                         for(int i =0;i<ilosc;i++){
                             produkty.add(new Product(Integer.parseInt(substrings[6*i+7]), substrings[6*i+4], substrings[6*i+5], Float.parseFloat(substrings[6*i+2]), Integer.parseInt(substrings[6*i+3]), substrings[6*i+6]));
                             if(!categories.contains(substrings[6*i+6])){
