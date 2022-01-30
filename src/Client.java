@@ -399,6 +399,9 @@ class Client extends JFrame implements ActionListener, Runnable{
                 for (int i = 0;i<categories.size();i++) {
                     DefaultListModel listOfItems = new DefaultListModel();
                     DefaultListModel listOfItemsDesc = new DefaultListModel();
+                    listOfItems.clear();
+                    listOfItemsDesc.clear();
+                    itemsList.clearSelection();
                     for (int j = 0; j < produkty.size(); j++) {
                         if(produkty.get(j).kategoria.equals(categories.get(i))){
 
@@ -496,6 +499,28 @@ class Client extends JFrame implements ActionListener, Runnable{
 
         itemsInCartList.setDragEnabled(false);
         itemsInCartList.setDefaultEditor(Object.class, null);
+
+        addToCartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO
+                // oczytanie wybranego elementu z listy/tablicy
+                int count=0;
+                int odczytane_id=3;
+                int odczytana_ilosc_produktu=5;
+                try{
+                    count = Integer.parseInt(countField.getText());
+                }
+                catch (NumberFormatException ex){
+                    JOptionPane.showMessageDialog(null, "ilość musi być liczbą");
+                    count = -1;
+                }
+                if(count>=1 && count<=odczytana_ilosc_produktu){
+                    sendMessage("ADDTOCART#"+login.getText()+"#"+odczytane_id+"#"+count);
+                }else JOptionPane.showMessageDialog(null, "Podano nieprawidłową ilość towaru");
+
+            }
+        });
 
         deleteFromCartButton.addActionListener(new ActionListener() {
             @Override
