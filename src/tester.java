@@ -16,7 +16,7 @@ public class tester {
      //   Client c1 = new Client("name1","");
       //  Client c2 = new Client("name2","");
 
-        System.out.println(Request.parseRequest("SEARCH#12",con));
+     //   System.out.println(Request.parseRequest("SEARCH#12",con));
     //    System.out.println(Request.parseRequest("SEARCH#123'; Drop table klient -- ",con));
      //   System.out.println(Request.parseRequest("LOGINEMP#LoginPracownik31#A!2345678",con));
      //   System.out.println(Request.parseRequest("LOGINUSER#Login1#haslo!1",con));
