@@ -28,8 +28,8 @@ class Client extends JFrame implements ActionListener, Runnable{
     final static String CLIENTPANEL = "Client panel layout";
     final static String CARTPANEL = "Cart layout";
     final static String ORDERPANEL = "Order layout";
-
-
+    final static String CLIENTDATAPANEL = "Data of client layout";
+    final static String VIEWOFORDERS = "View of client orders layout";
     static Vector<Product> produkty = new Vector<>();
     private static boolean permission;
     JPanel cards; //a panel that uses CardLayout
@@ -335,7 +335,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         //Panel użykownika
 
         JButton viewCartButton = new JButton("Wyświetl koszyk");
-        JButton viewOrdersButton = new JButton("Wyświetl zamówienia");
+        JButton viewOrdersButton = new JButton("Zamówienia");
         JButton dataButton = new JButton("Wyświetl dane");
         JButton logoutButton = new JButton("Wyloguj");
         JButton searchButton = new JButton("Szukaj");
@@ -388,6 +388,15 @@ class Client extends JFrame implements ActionListener, Runnable{
                 pane.setSize(new Dimension(460,320));
             }
         });
+        dataButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,CLIENTDATAPANEL);
+                pane.setSize(new Dimension(200,400));
+            }
+        });
+
 
 
 
@@ -584,13 +593,81 @@ class Client extends JFrame implements ActionListener, Runnable{
         orderLayout.add(confirmOrderButton);
 
 
-        //dodawanie widoków do ramki
+        //layout danych klienta
+        JPanel dataOfClientLayout = new JPanel();
+        dataOfClientLayout.setLayout(null);
+
+        JLabel dataField = new JLabel("Dane osobowe");
+        JLabel nameOfClientField = new JLabel();
+        JLabel surnameOfClientField = new JLabel();
+        JLabel phoneOfClientField = new JLabel();
+        JLabel mailOfClientField = new JLabel();
+        JLabel addressOfClientField = new JLabel("Adres");
+        JLabel postCodeOfClientField = new JLabel();
+        JLabel streetOfClientField = new JLabel();
+        JLabel homeNumberOfClientField = new JLabel();
+        JButton backToMainPanelButton = new JButton("Powrót");
+
+        //wektor na dane osobowe
+        Vector<String> clientData = new Vector<>();
+        clientData.add("Dane");
+        clientData.add("Dane");
+        clientData.add("Dane");
+        clientData.add("Dane");
+        clientData.add("Dane");
+        clientData.add("Dane");
+        clientData.add("Dane");
+
+        nameOfClientField.setText("Imię: "+ clientData.get(0));
+        surnameOfClientField.setText("Nazwisko: "+ clientData.get(1));
+        phoneOfClientField.setText("Telefon: "+ clientData.get(2));
+        mailOfClientField.setText("Mail: "+ clientData.get(3));
+        postCodeOfClientField.setText("Kod pocztowy: "+ clientData.get(4));
+        streetOfClientField.setText("Ulica: "+ clientData.get(5));
+        homeNumberOfClientField.setText("Numer domu: "+ clientData.get(6));
+
+        dataField.setBounds(30,10,100,30);
+        nameOfClientField.setBounds(30,45,120,30);
+        surnameOfClientField.setBounds(30,80,120,30);
+        phoneOfClientField.setBounds(30,115,120,30);
+        mailOfClientField.setBounds(30,150,120,30);;
+        addressOfClientField.setBounds(30,185,50,30);
+        postCodeOfClientField.setBounds(30,220,120,30);
+        streetOfClientField.setBounds(30,255,120,30);
+        homeNumberOfClientField.setBounds(30,290,120,30);
+        backToMainPanelButton.setBounds(30,325,120,30);
+
+
+        backToMainPanelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,CLIENTPANEL);
+                pane.setSize(new Dimension(600,500));}
+
+        });
+
+
+        dataOfClientLayout.add(dataField);
+        dataOfClientLayout.add(nameOfClientField);
+        dataOfClientLayout.add(surnameOfClientField);
+        dataOfClientLayout.add(phoneOfClientField);
+        dataOfClientLayout.add(mailOfClientField);
+        dataOfClientLayout.add(addressOfClientField);
+        dataOfClientLayout.add(postCodeOfClientField);
+        dataOfClientLayout.add(streetOfClientField);
+        dataOfClientLayout.add(homeNumberOfClientField);
+        dataOfClientLayout.add(backToMainPanelButton);
+
+
+
         cards = new JPanel(new CardLayout());
         cards.add(loginLayout, LOGINPANEL);
         cards.add(RegisterLayout, REGISTERPANEL);
         cards.add(panelLayout,CLIENTPANEL);
         cards.add(cartLayout,CARTPANEL);
         cards.add(orderLayout, ORDERPANEL);
+        cards.add(dataOfClientLayout,CLIENTDATAPANEL);
         pane.add(cards, BorderLayout.CENTER);
 
 
