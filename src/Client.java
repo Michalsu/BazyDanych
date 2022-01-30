@@ -104,7 +104,9 @@ class Client extends JFrame implements ActionListener, Runnable{
                     }else JOptionPane.showMessageDialog(null, combinedMessage.toString());
                 }else JOptionPane.showMessageDialog(null, "Musisz wprowadzić dane logowania");
 
-
+                   // CardLayout cl = (CardLayout)(cards.getLayout());
+                //    cl.show(cards,CLIENTPANEL);
+                   // pane.setSize(new Dimension(850,500));
 
                 sendMessage("SEARCH#");
                 while(categories.size()==0);
@@ -275,6 +277,12 @@ class Client extends JFrame implements ActionListener, Runnable{
         //layout panelu użytkownika
         JPanel panelLayout = new JPanel();
 
+        //wektor na kategorie, wczytane z bazy
+
+
+        //vector na listy przedmiotów z każdej kategorii
+        //tutaj trzeba wczytać poszczególne przedmioty z bazy danych i ich opisy
+        Vector<Pair<DefaultListModel,DefaultListModel>> vectOfItemsByCategory= new Vector<Pair<DefaultListModel,DefaultListModel>>();
 
 
 
@@ -282,13 +290,13 @@ class Client extends JFrame implements ActionListener, Runnable{
         JLabel itemsLabel = new JLabel("Przedmioty");
         //miejsce na opis przedmiotu
         JTextArea itemsDescrition = new JTextArea();
-        itemsDescrition.setDisabledTextColor(Color.BLACK);
+
 
         JButton addToCartButton = new JButton("Dodaj do koszyka");
         JLabel countLabel = new JLabel("Ilość");
         JTextField countField = new JTextField();
 
-
+        itemsDescrition.setDisabledTextColor(Color.BLACK);
 
 
 
@@ -356,7 +364,9 @@ class Client extends JFrame implements ActionListener, Runnable{
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 model.setRowCount(0);
+
                 if(!e.getValueIsAdjusting())
+                    if(!categoryList.isSelectionEmpty())
                     for(int i = 0 ; i < produkty.size();i++)
                     if(produkty.get(i).kategoria.equals(categoryList.getSelectedValue().toString())) {
                         Vector<String> temp = new Vector<>();
@@ -412,28 +422,9 @@ class Client extends JFrame implements ActionListener, Runnable{
             public void actionPerformed(ActionEvent e) {
                 sendMessage("SEARCH#"+DataSecurity.sanitizeInput(searchField.getText()).replace("#",""));
                 Vector<String> temp = categories;
+                System.out.println(categories);
                // while(temp == categories);
-//                for(int i=0; i<produkty.size();i++){
-//                    column.addElement(String.valueOf(produkty.get(i)));
-//                }
 
-                for (int i = 0;i<categories.size();i++) {
-                    DefaultListModel listOfItems = new DefaultListModel();
-                    DefaultListModel listOfItemsDesc = new DefaultListModel();
-                    listOfItems.clear();
-                    listOfItemsDesc.clear();
-                    itemsList.clearSelection();
-                    for (int j = 0; j < produkty.size(); j++) {
-                        if(produkty.get(j).kategoria.equals(categories.get(i))){
-
-                            listOfItems.addElement(produkty.get(j).nazwa);
-
-                            listOfItemsDesc.addElement(produkty.get(j).nazwa);
-                        }
-
-                    }
-
-                }
                 categoryList.setListData(categories);
 
 
@@ -896,8 +887,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                             }
                         }
 
-                        System.out.println(produkty);
-                        System.out.println(categories);
+                     //   System.out.println(produkty);
 
                         break;
                 }
