@@ -1,3 +1,5 @@
+import java.text.DecimalFormat;
+
 public class Product {
     int ID;
     String nazwa;
@@ -6,6 +8,9 @@ public class Product {
     int promocja;
     String kategoria;
     int ilosc;
+
+
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     public Product(int ID, String nazwa, String opis, float cena, int promocja, String kategoria, int ilosc) {
         this.ID = ID;
@@ -29,5 +34,9 @@ public class Product {
                 ", kategoria='" + kategoria + '\'' +
                 ", ilosc=" + ilosc +
                 '}'+"\n";
+    }
+
+    public String toCompareString(){
+        return ID + "   " + nazwa + "       " + cena + "  " + df.format(cena *((100.0-promocja)/100)) + "  " + promocja + "\n";
     }
 }
