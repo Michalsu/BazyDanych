@@ -40,6 +40,16 @@ class Client extends JFrame implements ActionListener, Runnable{
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
+    private void updateProducts(){
+        sendMessage("SEARCH#");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        calabaza=new Vector<>(produkty);
+    }
     public void setPermission(boolean permission) {
         this.permission = permission;
     }
@@ -113,17 +123,11 @@ class Client extends JFrame implements ActionListener, Runnable{
                 //    cl.show(cards,CLIENTPANEL);
                    // pane.setSize(new Dimension(850,500));
 
-                sendMessage("SEARCH#");int i=0;
-                //(categories.size()==0 && i < 10000){
-                  //  i++;
-               // }
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
+                updateProducts();
                 categoryList.setListData(categories);
-                calabaza=new Vector<>(produkty);
+
+
             }
         });
 
@@ -679,11 +683,14 @@ class Client extends JFrame implements ActionListener, Runnable{
         confirmOrderButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                CardLayout cl = (CardLayout)(cards.getLayout());
-                cl.show(cards,CLIENTPANEL);
-                pane.setSize(new Dimension(850,500));
+
+              sendMessage("BUY#"+login.getText()+"#Złożono#" + chooseDeliveryBox.getSelectedItem().toString() +"#"+choosePayingBox.getSelectedItem().toString() );
+                model.setRowCount(0);
+
+
 
             }
+
         });
 
 
@@ -944,7 +951,6 @@ class Client extends JFrame implements ActionListener, Runnable{
                                 categories.add(substrings[7*i+6]);
                             }
                         }
-                        System.out.println(produkty);
                         break;
                     case "GETITEMSFROMCART":
                         productsInCart.clear();
@@ -955,6 +961,30 @@ class Client extends JFrame implements ActionListener, Runnable{
                                 if(p.ID == Integer.parseInt(substrings[i])){
                                     productsInCart.addElement(new Pair<Product,Integer>(p,Integer.parseInt(substrings[i+1])));}
                         }
+
+
+                        break;
+                    case "BUY":
+                        if(substrings[1].equals("OK")) {
+                            JOptionPane.showMessageDialog(null, "Dokonano zakupu");
+                            updateProducts();
+
+                            CardLayout cl = (CardLayout) (cards.getLayout());
+                            cl.show(cards,CLIENTPANEL);
+                            this.setSize(new Dimension(850,500));
+
+                        }
+                        else  if(substrings[1].equals("BRAK") )
+                        {
+                            JOptionPane.showMessageDialog(null, "Brak przedmiotów w magazynie, zaaktualizowano koszyk");
+
+                            CardLayout cl = (CardLayout) (cards.getLayout());
+                            cl.show(cards,CLIENTPANEL);
+                            this.setSize(new Dimension(850,500));
+
+
+                        }
+
 
 
                         break;

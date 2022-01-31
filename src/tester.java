@@ -73,7 +73,7 @@ public class tester {
     // Request.parseRequest("ADDTOCART#Adamnowak#2#2", con);
     //   Request.parseRequest("ADDTOCART#Adamnowak#1#2", con);
     //    Request.parseRequest("ADDTOCART#Adam#2#2", con);
-     // Request.parseRequest("ADDTOCART#Login1#3#2", con);
+      Request.parseRequest("ADDTOCART#a#86#24  ", con);
        // Request.parseRequest("ADDPRODUCTTOMAGAZINE#2#1#1", con);
            // Request.parseRequest("DELETEPRODUCT#11#", con);
        // Request.parseRequest("ADDTOCART#Adam#1#5", con);
@@ -83,7 +83,7 @@ public class tester {
       //  Request.parseRequest("CHANGEPRODUCT#15#1#0#dasda#dsadas#1", con);
 //Request.parseRequest("DELETEFROMCART#Login1#16", con);
       //  Request.parseRequest("DELETEFROMCART#Login1#4", con);
-   // Request.parseRequest("BUY#Login1#gotowe#karta#dodomu", con);
+    Request.parseRequest("BUY#a#gotowe#karta#dodomu", con);
       //Request.parseRequest("DELETEPRODUCT#2", con);
 
 
