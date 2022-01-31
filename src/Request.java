@@ -200,6 +200,7 @@ public class Request {
                     e.printStackTrace();
                 }
                 deleteFromCart(Integer.parseInt(substrings[2]),koszyk_id,con);
+                response = "Usunięto";
                 break;
             case "BUY":
                 boolean ifEmpty = false;

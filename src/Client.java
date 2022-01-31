@@ -442,16 +442,16 @@ class Client extends JFrame implements ActionListener, Runnable{
         categoryLabel.setBounds(10,10,80,30);
         categoryScroll.setBounds(10,40,150,180);
         itemsLabel.setBounds(180,10,80,30);
-        itemScroll.setBounds(180,40,400,180);
+        itemScroll.setBounds(180,40,480,180);
         searchField.setBounds(10,250,120,30);
         searchButton.setBounds(140,250,80,30);
         itemsDescrition.setBounds(10,290,350,100);
         countLabel.setBounds(10,400,40,30);
         countField.setBounds(45,400,50,30);
         addToCartButton.setBounds(100,400, 200,30);
-        viewCartButton.setBounds(600,40, 130,30);
-        viewOrdersButton.setBounds(600,75, 130,30);
-        logoutButton.setBounds(600,110, 130,30);
+        viewCartButton.setBounds(670,40, 130,30);
+        viewOrdersButton.setBounds(670,75, 130,30);
+        logoutButton.setBounds(670,110, 130,30);
 
 
 
@@ -481,7 +481,8 @@ class Client extends JFrame implements ActionListener, Runnable{
         JButton deleteFromCartButton = new JButton("Usuń z koszyka");
         JButton orderButton = new JButton("Zamów");
         //tutaj trzeba wpisać pobraną cenę
-        JLabel priceOfCart = new JLabel("Cena");
+        JLabel priceOfCart = new JLabel();
+        JLabel priceLabel = new JLabel("Wartość koszyka");
 
 
 
@@ -498,6 +499,7 @@ class Client extends JFrame implements ActionListener, Runnable{
 
         itemsInCartList.setDragEnabled(false);
         itemsInCartList.setDefaultEditor(Object.class, null);
+        itemsInCartList.getColumnModel().getColumn(0).setMinWidth(120);
 
         addToCartButton.addActionListener(new ActionListener() {
             @Override
@@ -535,7 +537,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                 tableModel.addColumn("Cena");
                 tableModel.setRowCount(0);
 
-                sendMessage("GETITEMSFROMCART#" +login.getText()+"#" );
+                sendMessage("GETITEMSFROMCART#" +login.getText());
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -562,23 +564,41 @@ class Client extends JFrame implements ActionListener, Runnable{
 
                 tableModel.fireTableDataChanged();
                 itemsInCartList.setModel(tableModel);
-                priceOfCart.setText(String.valueOf(price));
+                priceOfCart.setText(String.valueOf(df.format(price)));
             }
             }
         );
 
 
 
-
         deleteFromCartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                DefaultTableModel model = (DefaultTableModel) itemsInCartList.getModel();
-                int[] rows = itemsInCartList.getSelectedRows();
-                for(int i=0;i<rows.length;i++){
-                    model.removeRow(rows[i]-i);
 
-            }}
+               if(itemsInCartList.getSelectedRowCount()==1) {
+
+                     DefaultTableModel model = (DefaultTableModel) itemsInCartList.getModel();
+                    int selectedRow = itemsInCartList.getSelectedRow();
+
+                    for(Pair<Product,Integer> p : productsInCart)
+                        if(p.getL().nazwa.equals(itemsInCartList.getValueAt(selectedRow,0) )){
+                            sendMessage("DELETEFROMCART#" + login.getText() + "#" + p.getL().ID);
+                            String price = priceOfCart.getText().toString();
+                            price =  price.replaceAll(",",".");
+                            float price1 = Float.parseFloat(price);
+                             price = (model.getValueAt(selectedRow,3).toString());
+                            price =  price.replaceAll(",",".");
+                             float price2 = Float.parseFloat(price);
+
+                            priceOfCart.setText(String.valueOf(df.format((price1-price2))));
+                        }
+                   model.removeRow(selectedRow);
+
+                }else
+
+                    JOptionPane.showMessageDialog(null,"Proszę zaznaczyć przedmiot do usunięcia");
+
+            }
         });
 
         backButton.addActionListener(new ActionListener() {
@@ -612,12 +632,13 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 
         cartScroll.setBounds(10,10,430,200);
-        priceOfCart.setBounds(10,210,80,30);
+        priceLabel.setBounds(10,210,100,30);
+        priceOfCart.setBounds(115,210,80,30);
         deleteFromCartButton.setBounds(10,240,180,30);
         orderButton.setBounds(195,240,80,30);
         backButton.setBounds(280,240,150,30);
 
-
+        cartLayout.add(priceLabel);
         cartLayout.add(cartScroll);
         cartLayout.add(priceOfCart);
         cartLayout.add(orderButton);
