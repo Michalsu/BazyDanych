@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -36,6 +37,8 @@ class Client extends JFrame implements ActionListener, Runnable{
     private static boolean permission;
     JPanel cards; //a panel that uses CardLayout
 
+
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     public void setPermission(boolean permission) {
         this.permission = permission;
@@ -487,6 +490,8 @@ class Client extends JFrame implements ActionListener, Runnable{
 
         model1.addColumn("Produkt");
         model1.addColumn("Ilość");
+        model1.addColumn("Cena sztuka");
+        model1.addColumn("Cena");
 
 
 
@@ -526,6 +531,8 @@ class Client extends JFrame implements ActionListener, Runnable{
                 DefaultTableModel tableModel = new DefaultTableModel();
                 tableModel.addColumn("Nazwa");
                 tableModel.addColumn("Ilość");
+                tableModel.addColumn("Cena szt.");
+                tableModel.addColumn("Cena");
                 tableModel.setRowCount(0);
 
                 sendMessage("GETITEMSFROMCART#" +login.getText()+"#" );
@@ -547,6 +554,8 @@ class Client extends JFrame implements ActionListener, Runnable{
                         Vector<String> temp = new Vector<>();
                         temp.add(String.valueOf(p.getL().nazwa));
                         temp.add(String.valueOf(p.getR()));
+                        temp.add(df.format((p.getL().cena)*((100.0-p.getL().promocja)/100)));
+                        temp.add(df.format((p.getL().cena)*Integer.parseInt(temp.get(1))*((100.0-p.getL().promocja)/100)));
                         price += (p.getL().cena)*Integer.parseInt(temp.get(1))*((100.0-p.getL().promocja)/100);
                         tableModel.addRow(temp);
                     }
