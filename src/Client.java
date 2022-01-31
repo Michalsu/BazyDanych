@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -35,6 +36,7 @@ class Client extends JFrame implements ActionListener, Runnable{
     static Vector<String> categories = new Vector<>();
     static Vector<Order> orders = new Vector<>();
     static Vector<Pair<Product,Integer>> productsInCart = new Vector<>();
+    static Vector<Product> porownywarka = new Vector<>();
     private static boolean permission;
     JPanel cards; //a panel that uses CardLayout
 
@@ -436,6 +438,81 @@ class Client extends JFrame implements ActionListener, Runnable{
         });
 
 
+        JButton addToCompareButton = new JButton("Dodaj do porównania");
+        JButton clearCompareButton = new JButton("Wyczyść porówanie");
+        JButton compareButton = new JButton("Porównaj produkty");
+
+        clearCompareButton.setEnabled(false);
+        compareButton.setEnabled(false);
+
+        addToCompareButton.setBounds(620, 250,180,30);
+        compareButton.setBounds(620,285,180,30);
+        clearCompareButton.setBounds(620,320,180,30);
+
+
+        addToCompareButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int id;
+                try{
+                    id = Integer.parseInt((String) itemsTable.getValueAt(itemsTable.getSelectedRow(),0));
+                }catch(ArrayIndexOutOfBoundsException ex){
+                    return;
+                }
+                for (Product prod: produkty) {
+                    if(prod.ID == id){
+                        porownywarka.add(prod);
+                        if(porownywarka.size()>=1)clearCompareButton.setEnabled(true);
+                        if(porownywarka.size()>1)compareButton.setEnabled(true);
+                        return;
+                    }
+                }
+            }
+        });
+        clearCompareButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                porownywarka.clear();
+                clearCompareButton.setEnabled(false);
+                compareButton.setEnabled(false);
+            }
+        });
+
+        compareButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Product promocjaProcentID=null;
+                int promocjaProcent=0;
+                Product promocjaCenaID=null;
+                float promocjaCena=0;
+                Product cenaID=null;
+                float cena=Float.MAX_VALUE;
+
+                StringBuilder sb = new StringBuilder();
+                sb.append("ID        | nazwa        | cena        | cena prom.        | promocja \n\n");
+
+                for (Product prod: porownywarka) {
+                    sb.append(prod.toCompareString());
+                    if(prod.promocja>promocjaProcent) {
+                        promocjaProcent = promocjaProcent;
+                        promocjaProcentID = prod;
+                    }
+                    if(prod.promocja*prod.cena/100>promocjaCena){
+                        promocjaCena=prod.promocja*prod.cena;
+                        promocjaCenaID = prod;
+                    }
+                    if(prod.cena< cena){
+                        cena=prod.cena;
+                        cenaID = prod;
+                    }
+                }
+                sb.append("\nNajnizsza cena:  " + cenaID.nazwa + " " +cenaID.cena + "\n");
+                sb.append("Największa promocja:  " + promocjaProcentID.nazwa + "   " +promocjaProcentID.promocja + "\n");
+                sb.append("Największa oszczędność:  " + promocjaCenaID.nazwa + "   " +df.format(promocjaCenaID.promocja*promocjaCenaID.cena/100));
+                JOptionPane.showMessageDialog(null, sb.toString(), "Porównanie", JOptionPane.PLAIN_MESSAGE);
+
+            }
+        });
 
         categoryLabel.setBounds(10,10,80,30);
         categoryScroll.setBounds(10,40,150,180);
@@ -466,6 +543,9 @@ class Client extends JFrame implements ActionListener, Runnable{
         panelLayout.add(logoutButton);
         panelLayout.add(searchButton);
         panelLayout.add(searchField);
+        panelLayout.add(addToCompareButton);
+        panelLayout.add(compareButton);
+        panelLayout.add(clearCompareButton);
         panelLayout.setLayout(null);
 
 //Layout koszyka
@@ -504,7 +584,6 @@ class Client extends JFrame implements ActionListener, Runnable{
             public void actionPerformed(ActionEvent e) {
                 //TODO
                 // oczytanie wybranego elementu z listy/tablicy
-
 
                 int id = Integer.parseInt((String) itemsTable.getValueAt(itemsTable.getSelectedRow(),0));
                // System.out.println(id);
@@ -684,7 +763,6 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 
             }
-
         });
 
 
@@ -979,6 +1057,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                                 categories.add(substrings[7*i+6]);
                             }
                         }
+                        //System.out.println(produkty);
                         break;
                     case "GETITEMSFROMCART":
                         productsInCart.clear();
