@@ -3,6 +3,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Vector;
 
 public class Request {
 
@@ -154,8 +155,34 @@ public class Request {
 
 
                 }
+
+                response = "Dodano do koszyka";
                 updatePrice(koszyk_id,con);
 
+                break;
+            case "GETITEMSFROMCART":
+                sb = new StringBuilder();
+                sb.append("SELECT koszyk_id FROM klient WHERE login = '" + substrings[1] +"'");
+                query=sb.toString();
+
+                koszyk_id = 0;
+                try {
+
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery(query);
+                    rs.next();
+                    koszyk_id = rs.getInt(1);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                List<Pair<Integer,Integer>> products = new ArrayList<>();
+                products =  getProductsFromCart(koszyk_id,con);
+                StringBuilder resp = new StringBuilder();
+                resp.append("GETITEMSFROMCART#");
+                for(int i=0;i<products.size();i++)
+                    resp.append(products.get(i).getR()+ "#"+products.get(i).getL() + "#");
+
+                response = resp.toString();
                 break;
             case "DELETEFROMCART":
                 sb = new StringBuilder();

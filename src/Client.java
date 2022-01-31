@@ -31,6 +31,7 @@ class Client extends JFrame implements ActionListener, Runnable{
     final static String VIEWOFORDERS = "View of client orders layout";
     static Vector<Product> produkty = new Vector<>();
     static Vector<String> categories = new Vector<>();
+    static Vector<Pair<Product,Integer>> productsInCart = new Vector<>();
     private static boolean permission;
     JPanel cards; //a panel that uses CardLayout
 
@@ -114,6 +115,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                 }
 
                 categoryList.setListData(categories);
+                categoryList.repaint();
 
             }
         });
@@ -298,6 +300,8 @@ class Client extends JFrame implements ActionListener, Runnable{
         JLabel countLabel = new JLabel("Ilość");
         JTextField countField = new JTextField();
 
+
+
         itemsDescrition.setDisabledTextColor(Color.BLACK);
 
 
@@ -307,6 +311,8 @@ class Client extends JFrame implements ActionListener, Runnable{
         JButton viewCartButton = new JButton("Wyświetl koszyk");
         JButton viewOrdersButton = new JButton("Zamówienia");
         JButton logoutButton = new JButton("Wyloguj");
+
+
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -395,14 +401,7 @@ class Client extends JFrame implements ActionListener, Runnable{
 
             }
         });
-        viewCartButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                CardLayout cl = (CardLayout)(cards.getLayout());
-                cl.show(cards,CARTPANEL);
-                pane.setSize(new Dimension(460,320));
-            }
-        });
+
 
         viewOrdersButton.addActionListener(new ActionListener() {
             @Override
@@ -418,34 +417,14 @@ class Client extends JFrame implements ActionListener, Runnable{
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sendMessage("SEARCH#"+DataSecurity.sanitizeInput(searchField.getText()).replace("#","").replace(" ","#"));
-                Vector<String> temp = categories;
-                System.out.println(categories);
-               // while(temp == categories);
+                sendMessage("SEARCH#"+DataSecurity.sanitizeInput(searchField.getText()).replace("#",""));
 
                 categoryList.setListData(categories);
             }
         });
 
 
-/*
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String searchingItem = searchField.getText();
-                System.out.println(listOfItems.get(0));
 
-                Vector<String> temp = new Vector<>();
-                for (int i = 0; i< listOfItems.size(); i++)
-                        if(listOfItems.get(i).equals(searchingItem)) {
-                            itemsList.clearSelection();
-                            temp.add(searchingItem);
-                            itemsList.setListData(temp);
-                        }
-            }
-        });
-
-*/
         categoryLabel.setBounds(10,10,80,30);
         categoryScroll.setBounds(10,40,150,180);
         itemsLabel.setBounds(180,10,80,30);
@@ -482,14 +461,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         cartLayout.setLayout(null);
 
 //tutaj trzeba ściągnąć rzeczy w koszyku z bazy
-        Vector<Vector> rowData = new Vector<Vector>();
-        Vector<String> column = new Vector<>();
-        //wektor na przedmioty
-        Vector<String> vec = new Vector<>();
-        vec.add("Przedmiot1");
-        vec.add("Ilość1");
 
-        rowData.add(vec);
 
         JButton backButton = new JButton("Powrót do sklepu");
         JButton deleteFromCartButton = new JButton("Usuń z koszyka");
@@ -499,11 +471,13 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 
 
-        column.addElement("Przedmiot");
-        column.addElement("Ilość");
+        DefaultTableModel model1 = new DefaultTableModel();
+        JTable itemsInCartList = new JTable(model1);
+
+        model1.addColumn("Produkt");
+        model1.addColumn("Ilość");
 
 
-        JTable itemsInCartList = new JTable(rowData,column);
 
         itemsInCartList.setDragEnabled(false);
         itemsInCartList.setDefaultEditor(Object.class, null);
@@ -523,13 +497,35 @@ class Client extends JFrame implements ActionListener, Runnable{
                     count = Integer.parseInt(countField.getText());
                 }
                 catch (NumberFormatException ex){
-                    JOptionPane.showMessageDialog(null, "ilość musi być liczbą");
+                    JOptionPane.showMessageDialog(null, "Ilość musi być liczbą");
                     count = -1;
                 }
                 if(count>=1 && count<=odczytana_ilosc_produktu){
                     sendMessage("ADDTOCART#"+login.getText()+"#"+id+"#"+count);
                 }else JOptionPane.showMessageDialog(null, "Podano nieprawidłową ilość towaru");
 
+            }
+        });
+        viewCartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                float price = 0;
+                model1.setRowCount(0);
+
+                sendMessage("GETITEMSFROMCART#" +login.getText()+"#" );
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,CARTPANEL);
+                pane.setSize(new Dimension(460,320));
+
+                for( Pair<Product,Integer> p : productsInCart)
+                {
+                    Vector<String> temp = new Vector<>();
+                    temp.add(String.valueOf(p.getL().nazwa));
+                    temp.add(String.valueOf(p.getR()));
+                    price += (p.getL().cena)*Integer.parseInt(temp.get(1))*((100.0-p.getL().promocja)/100);
+                    model1.addRow(temp);
+                }
+                priceOfCart.setText(String.valueOf(price));
             }
         });
 
@@ -885,6 +881,18 @@ class Client extends JFrame implements ActionListener, Runnable{
                                 categories.add(substrings[6*i+6]);
                             }
                         }
+                        break;
+                    case "GETITEMSFROMCART":
+                        productsInCart.clear();
+                        if(substrings.length>1)
+                        for(int i =1;i<substrings.length;i++){
+                            for(Product p : produkty)
+                                if(p.ID == Integer.parseInt(substrings[i])){
+                                    i++;
+                                    productsInCart.addElement(new Pair<Product,Integer>(p,Integer.parseInt(substrings[i])));}
+                        }
+
+
                         break;
                     default:
                         JOptionPane.showMessageDialog(null,"Komunikat z serwera "+message);
