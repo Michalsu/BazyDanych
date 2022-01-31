@@ -33,6 +33,7 @@ class Client extends JFrame implements ActionListener, Runnable{
     static Vector<Product> produkty = new Vector<>();
     static Vector<Product> calabaza= new Vector<>();
     static Vector<String> categories = new Vector<>();
+    static Vector<Order> orders = new Vector<>();
     static Vector<Pair<Product,Integer>> productsInCart = new Vector<>();
     private static boolean permission;
     JPanel cards; //a panel that uses CardLayout
@@ -341,7 +342,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         JTextField searchField = new JTextField();
 
 
-        JList itemsList = new JList();
+
 
 
         DefaultTableModel model = new DefaultTableModel();
@@ -373,7 +374,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 
-        itemsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        itemsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         categoryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //aktualiacja przedmiotów dla wybranej listy
 
@@ -417,14 +418,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         });
 
 
-        viewOrdersButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                CardLayout cl = (CardLayout)(cards.getLayout());
-                cl.show(cards,VIEWOFORDERS);
-                pane.setSize(new Dimension(460,320));
-            }
-        });
+
 
 
         itemsDescrition.setEnabled(false);
@@ -717,22 +711,56 @@ class Client extends JFrame implements ActionListener, Runnable{
         clientOrdersLayout.setLayout(null);
 
 //tutaj trzeba ściągnąć rzeczy w koszyku z bazy
-        DefaultListModel <String> rowOfOrdersData = new DefaultListModel <String>();
+        DefaultTableModel  OrdersModel = new DefaultTableModel ();
 
-        rowOfOrdersData.addElement("zamówienie 1");
-        rowOfOrdersData.addElement("zamówienie 2");
 
         JButton backFromOrdersButton = new JButton("Powrót do sklepu");
         JLabel ordersLabel = new JLabel("Zamówienia");
 
 
-        JList ordersOfClientsList = new JList(rowOfOrdersData);
+        OrdersModel.addColumn("Numer");
+        OrdersModel.addColumn("Data");
+        OrdersModel.addColumn("Stan");
+        OrdersModel.addColumn("Płatność");
+        OrdersModel.addColumn("SposóbDostawy");
+        OrdersModel.addColumn("Produkty");
+        OrdersModel.addColumn("Wartość zamówienia");
+
+        JTable ordersOfClientsList = new JTable(OrdersModel);
 
 
         ordersOfClientsList.setDragEnabled(false);
         JScrollPane ordersScroll = new JScrollPane(ordersOfClientsList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
+        viewOrdersButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                OrdersModel.setRowCount(0);
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards,VIEWOFORDERS);
+                pane.setSize(new Dimension(800,320));
+                sendMessage("GETORDERS#"+login.getText());
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
+
+                for(Order o : orders) {
+                    Vector<String> temp = new Vector<>();
+                    temp.add(String.valueOf(o.ID));
+                    temp.add(o.sate);
+                    temp.add(o.state);
+                    temp.add(o.payment);
+                    temp.add(o.delivery);
+                    temp.add(o.items);
+                    temp.add(String.valueOf(o.value));
+                    OrdersModel.addRow(temp);
+                }
+            }
+        });
         backFromOrdersButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -742,9 +770,9 @@ class Client extends JFrame implements ActionListener, Runnable{
             }
 
         });
-        ordersLabel.setBounds(170,5,100,30);
-        ordersScroll.setBounds(10,40,400,200);
-        backFromOrdersButton.setBounds(150,245,150,30);
+        ordersLabel.setBounds(350,5,100,30);
+        ordersScroll.setBounds(10,40,750,200);
+        backFromOrdersButton.setBounds(325,245,150,30);
 
         clientOrdersLayout.add(ordersLabel);
         clientOrdersLayout.add(ordersScroll);
@@ -985,9 +1013,15 @@ class Client extends JFrame implements ActionListener, Runnable{
 
                         }
 
-
-
                         break;
+                    case "GETORDERS":
+                        orders.clear();
+                        for(int i = 1;i<substrings.length;i++) {
+                            Order ord = new Order(Integer.parseInt(substrings[i]), substrings[i+1], substrings[i+2], substrings[i+3],substrings[i+4],substrings[i+5],Float.parseFloat(substrings[i+6]));
+                            orders.add(ord);
+                            i+=6;
+                        }
+                            break;
                     default:
                         JOptionPane.showMessageDialog(null,"Komunikat z serwera "+message);
                         break;

@@ -73,7 +73,7 @@ public class tester {
     // Request.parseRequest("ADDTOCART#Adamnowak#2#2", con);
     //   Request.parseRequest("ADDTOCART#Adamnowak#1#2", con);
     //    Request.parseRequest("ADDTOCART#Adam#2#2", con);
-      Request.parseRequest("ADDTOCART#a#86#24  ", con);
+      Request.parseRequest("GETORDERS#a", con);
        // Request.parseRequest("ADDPRODUCTTOMAGAZINE#2#1#1", con);
            // Request.parseRequest("DELETEPRODUCT#11#", con);
        // Request.parseRequest("ADDTOCART#Adam#1#5", con);

@@ -425,22 +425,6 @@ public class Request {
             case "ADDPRODUCTTOMAGAZINE":
 
                 boolean ifExist = false;
-                sb = new StringBuilder();
-                sb.append("SELECT liczba_produktow FROM magazyn_produkt where magazyn_ID = " + substrings[1] +
-                        " and produkt_ID = " +substrings[2]);
-                query=sb.toString();
-
-
-                try {
-                    Statement stmt=con.createStatement();
-                    ResultSet rs=stmt.executeQuery(query);
-                    if(rs.next())
-                    ifExist = true;
-
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
 
                 sb = new StringBuilder();
                 sb.append("SELECT przestrzen_magazynowa FROM magazyn where magazyn_ID = " + substrings[1] );
@@ -651,6 +635,44 @@ public class Request {
                 if(exCode==0) response="OK";
                 else response="ERROR"+exCode;
                 break;
+            case "GETORDERS":
+                sb = new StringBuilder();
+                sb.append("SELECT  klient_ID FROM klient WHERE login = '" + substrings[1] +"';");
+
+                query=sb.toString();
+                klient_id = 0;
+                try {
+
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery(query);
+                    rs.next();
+                    klient_id = rs.getInt(1);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                sb = new StringBuilder();
+                sb.append("SELECT zamowienie_ID, Data, Stan, Platnosc,SposobDostawy, produkt_list, Wartosc_zamowienia" +
+                        " FROM zamowienie where klient_ID = " + klient_id );
+
+                StringBuilder orders = new StringBuilder();
+                query=sb.toString();
+
+                orders.append("GETORDERS#");
+                try {
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery(query);
+                    while(rs.next())
+                    orders.append(rs.getInt(1)+"#"+rs.getDate(2)+"#"+rs.getString(3)+"#"+rs.getString(4)+
+                            "#"+rs.getString(5)+"#"+rs.getString(6)+"#"+rs.getString(7)+"#");
+
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                orders.deleteCharAt(orders.length()-1);
+            response = orders.toString();
         }
         return response;
     }
