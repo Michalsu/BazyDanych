@@ -5,14 +5,16 @@ public class Product {
     float cena;
     int promocja;
     String kategoria;
+    int ilosc;
 
-    public Product(int ID, String nazwa, String opis, float cena, int promocja, String kategoria) {
+    public Product(int ID, String nazwa, String opis, float cena, int promocja, String kategoria, int ilosc) {
         this.ID = ID;
         this.nazwa = nazwa;
         this.opis = opis;
         this.cena = cena;
         this.promocja = promocja;
         this.kategoria = kategoria;
+        this.ilosc = ilosc;
     }
 
 
@@ -25,6 +27,7 @@ public class Product {
                 ", cena=" + cena +
                 ", promocja=" + promocja +
                 ", kategoria='" + kategoria + '\'' +
-                "}\n";
+                ", ilosc=" + ilosc +
+                '}'+"\n";
     }
 }

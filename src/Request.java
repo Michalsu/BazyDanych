@@ -44,7 +44,7 @@ public class Request {
                 break;
             case "SEARCH":
                 StringBuilder sb = new StringBuilder();
-                sb.append("SELECT p.produkt_ID as ID, p.cena, p.Promocja, p.nazwa, p.opis, k.Nazwa as kategoria FROM baza.produkt p JOIN baza.kategoria k ON p.kategoria_ID=k.kategoria_ID WHERE p.nazwa LIKE '%");
+                sb.append("SELECT p.produkt_ID as ID, p.cena, p.Promocja, p.nazwa, p.opis, k.Nazwa as kategoria, m.dostepnailosc as ilosc FROM baza.produkt p JOIN baza.kategoria k ON p.kategoria_ID=k.kategoria_ID JOIN (SELECT produkt_ID ,sum(liczba_produktow) as dostepnailosc FROM baza.magazyn_produkt group by produkt_ID) m ON p.produkt_ID=m.produkt_ID WHERE p.nazwa LIKE '%");
                 if(parimeters>1){
                     for(int i=1;i<parimeters-1;i++){
                         sb.append(substrings[i]);
@@ -66,7 +66,7 @@ public class Request {
                         response = rs.getFloat("cena")+"#"+ rs.getInt("Promocja") +"#"+
                                 rs.getString("nazwa")+ "#"+rs.getString("opis")+"#"+
                                 rs.getString("kategoria")+"#"+
-                                rs.getInt("ID")+"#";
+                                rs.getInt("ID")+"#"+rs.getInt(("ilosc"))+"#";
                         i++;
                         ab.append(response);
 
