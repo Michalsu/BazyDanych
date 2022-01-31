@@ -334,12 +334,14 @@ class Client extends JFrame implements ActionListener, Runnable{
         model.addColumn("Nazwa");
         model.addColumn("Cena");
         model.addColumn("Promocja");
+        model.addColumn("Ilość");
 
         itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         itemsTable.getColumnModel().getColumn(0).setMinWidth(80);
         itemsTable.getColumnModel().getColumn(1).setMinWidth(155);
         itemsTable.getColumnModel().getColumn(2).setMinWidth(50);
         itemsTable.getColumnModel().getColumn(3).setMinWidth(30);
+        itemsTable.getColumnModel().getColumn(4).setMinWidth(30);
 
 
 
@@ -372,6 +374,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                         temp.add(produkty.get(i).nazwa);
                         temp.add(String.valueOf(produkty.get(i).cena));
                         temp.add(String.valueOf(produkty.get(i).promocja));
+                        temp.add(String.valueOf(produkty.get(i).ilosc));
                         model.addRow(temp);
                     }
                if(model.getRowCount()!=0)
@@ -880,11 +883,13 @@ class Client extends JFrame implements ActionListener, Runnable{
                         produkty.clear();
                         categories= new Vector<String>();
                         for(int i =0;i<ilosc;i++){
-                            produkty.add(new Product(Integer.parseInt(substrings[6*i+7]), substrings[6*i+4], substrings[6*i+5], Float.parseFloat(substrings[6*i+2]), Integer.parseInt(substrings[6*i+3]), substrings[6*i+6]));
-                            if(!categories.contains(substrings[6*i+6])){
-                                categories.add(substrings[6*i+6]);
+                            produkty.add(new Product(Integer.parseInt(substrings[7*i+7]), substrings[7*i+4], substrings[7*i+5],
+                                    Float.parseFloat(substrings[7*i+2]), Integer.parseInt(substrings[7*i+3]), substrings[7*i+6],Integer.parseInt(substrings[7*i+8])));
+                            if(!categories.contains(substrings[7*i+6])){
+                                categories.add(substrings[7*i+6]);
                             }
                         }
+                        System.out.println(produkty);
                         break;
                     default:
                         JOptionPane.showMessageDialog(null,"Komunikat z serwera "+message);
