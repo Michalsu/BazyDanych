@@ -264,7 +264,7 @@ public class Request {
                             unavailableListOfProducts.remove(i);
                             i++;
                         }
-                        response = "Brak przedmiotów w magazynie";
+                        response = "BUY#BRAK";
                     }
 
 
@@ -335,7 +335,7 @@ public class Request {
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
-                        response = "OK";
+                        response = "BUY#OK";
                     }
 
 
@@ -997,13 +997,25 @@ else {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        int allCount = countOfProduct;
 
 
        for( int i = 0 ;i<products.size();i++)
-           if(products.get(i).getL() >= countOfProduct)
            {
-                int prod = products.get(i).getL() - countOfProduct;
+               int prod = 0;
+               if(products.get(i).getL()<=countOfProduct){
+                         prod = 0;
+                countOfProduct = countOfProduct - products.get(i).getL();
+               allCount+=products.get(i).getL();
+               }
+               else
+               {
+
+                   prod = products.get(i).getL() - countOfProduct;
+                   allCount+= countOfProduct;
+                   countOfProduct = 0;
+               }
+
                sb.setLength(0);
                sb.append("UPDATE magazyn_produkt SET liczba_produktow = "+ prod +  " WHERE produkt_ID =" + produkt_id + " AND magazyn_ID = " +products.get(i).getR() +";");
                query=sb.toString();
@@ -1015,7 +1027,6 @@ else {
                } catch (SQLException e) {
                    e.printStackTrace();
                }
-
 
            }
 
@@ -1030,9 +1041,10 @@ else {
         {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("SELECT liczba_produktow, magazyn_ID FROM magazyn_produkt WHERE produkt_ID = " + productsFromCart.get(i).getR() + ";");
-        int countOfMagazines = 0;
+        sb.append("SELECT liczba_produktow FROM magazyn_produkt WHERE produkt_ID = " + productsFromCart.get(i).getR() + ";");
+
         int  countOfProducts =0;
+
         String query=sb.toString();
 
         try {
@@ -1040,16 +1052,17 @@ else {
             Statement stmt=con.createStatement();
             ResultSet rs=stmt.executeQuery(query);
             while(rs.next()) {
-                if(rs.getInt(1) < productsFromCart.get(i).getL())
-                    countOfProducts++;
-                countOfMagazines++;
+                    countOfProducts+= rs.getInt(1);
+
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        if(countOfMagazines== countOfProducts)
+
+
+        if(countOfProducts<productsFromCart.get(i).getL())
             unvailableProducts.add(productsFromCart.get(i).getR());
 
         }
