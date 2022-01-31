@@ -110,10 +110,14 @@ class Client extends JFrame implements ActionListener, Runnable{
                    // pane.setSize(new Dimension(850,500));
 
                 sendMessage("SEARCH#");int i=0;
-                while(categories.size()==0 && i < 10000){
-                    i++;
+                //(categories.size()==0 && i < 10000){
+                  //  i++;
+               // }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-
                 categoryList.setListData(categories);
                 categoryList.repaint();
 
@@ -421,7 +425,11 @@ class Client extends JFrame implements ActionListener, Runnable{
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendMessage("SEARCH#"+DataSecurity.sanitizeInput(searchField.getText()).replace("#",""));
-
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
                 categoryList.setListData(categories);
             }
         });
@@ -482,6 +490,7 @@ class Client extends JFrame implements ActionListener, Runnable{
 
 
 
+
         itemsInCartList.setDragEnabled(false);
         itemsInCartList.setDefaultEditor(Object.class, null);
 
@@ -513,24 +522,44 @@ class Client extends JFrame implements ActionListener, Runnable{
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 float price = 0;
-                model1.setRowCount(0);
+
+                DefaultTableModel tableModel = new DefaultTableModel();
+                tableModel.addColumn("Nazwa");
+                tableModel.addColumn("Ilość");
+                tableModel.setRowCount(0);
 
                 sendMessage("GETITEMSFROMCART#" +login.getText()+"#" );
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards,CARTPANEL);
                 pane.setSize(new Dimension(460,320));
 
-                for( Pair<Product,Integer> p : productsInCart)
-                {
-                    Vector<String> temp = new Vector<>();
-                    temp.add(String.valueOf(p.getL().nazwa));
-                    temp.add(String.valueOf(p.getR()));
-                    price += (p.getL().cena)*Integer.parseInt(temp.get(1))*((100.0-p.getL().promocja)/100);
-                    model1.addRow(temp);
-                }
+
+                if(!productsInCart.isEmpty())
+
+                    for( Pair<Product,Integer> p : productsInCart)
+                    {
+
+                        Vector<String> temp = new Vector<>();
+                        temp.add(String.valueOf(p.getL().nazwa));
+                        temp.add(String.valueOf(p.getR()));
+                        price += (p.getL().cena)*Integer.parseInt(temp.get(1))*((100.0-p.getL().promocja)/100);
+                        tableModel.addRow(temp);
+                    }
+
+                tableModel.fireTableDataChanged();
+                itemsInCartList.setModel(tableModel);
                 priceOfCart.setText(String.valueOf(price));
             }
-        });
+            }
+        );
+
+
+
 
         deleteFromCartButton.addActionListener(new ActionListener() {
             @Override
@@ -889,6 +918,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                         break;
                     case "GETITEMSFROMCART":
                         productsInCart.clear();
+
                         if(substrings.length>1)
                         for(int i =1;i<substrings.length;i++){
                             for(Product p : produkty)

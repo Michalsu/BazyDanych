@@ -660,7 +660,7 @@ public class Request {
     }
     private static List<Pair<Integer,Integer>> getProductsFromCart(int koszyk_id,  Connection con)
     {
-
+        List<Pair<Integer, Integer>> listOfProducts = new ArrayList<Pair<Integer, Integer>>();
         StringBuilder sb =  new StringBuilder();
         String query;
         sb.setLength(0);
@@ -680,43 +680,46 @@ public class Request {
             e.printStackTrace();
         }
 
-        String[] items = produkty.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
+        if(produkty!=null) {
+            String[] items = produkty.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
 
-        int[] products = new int[items.length];
+            int[] products = new int[items.length];
 
-        for (int i = 0; i < items.length; i++) {
-            try {
-                products[i] = Integer.parseInt(items[i]);
-            } catch (NumberFormatException nfe) {
-            }};
-
-    int count = 0;
-
-        List<Pair<Integer,Integer>> listOfProducts = new ArrayList< Pair<Integer,Integer>>();
-        for(int i = 0 ;i<products.length;i++)
-        {
-            sb.setLength(0);
-            sb.append("SELECT liczba_sztuk FROM koszyk_produkt where koszyk_ID = "
-                    + koszyk_id + " and produkt_ID = " + products[i] + ";") ;
-            query=sb.toString();
-            Pair pair = new Pair();
-            try {
-
-                Statement stmt=con.createStatement();
-                ResultSet rs=stmt.executeQuery(query);
-                rs.next();
-                count = rs.getInt(1);
-            } catch (SQLException e) {
-                e.printStackTrace();
+            for (int i = 0; i < items.length; i++) {
+                try {
+                    products[i] = Integer.parseInt(items[i]);
+                } catch (NumberFormatException nfe) {
+                }
             }
+            ;
 
-                 pair.setL(count);
-               pair.setR(products[i]);
-            listOfProducts.add(pair);
+            int count = 0;
 
+
+            for (int i = 0; i < products.length; i++) {
+                sb.setLength(0);
+                sb.append("SELECT liczba_sztuk FROM koszyk_produkt where koszyk_ID = "
+                        + koszyk_id + " and produkt_ID = " + products[i] + ";");
+                query = sb.toString();
+                Pair pair = new Pair();
+                try {
+
+                    Statement stmt = con.createStatement();
+                    ResultSet rs = stmt.executeQuery(query);
+                    rs.next();
+                    count = rs.getInt(1);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                pair.setL(count);
+                pair.setR(products[i]);
+                listOfProducts.add(pair);
+
+            }
         }
-
         return  listOfProducts;
+
     }
 
     private static void updateStorageSpace(int magazyn_ID,  Connection con)
