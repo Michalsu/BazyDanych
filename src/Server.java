@@ -184,7 +184,7 @@ class ClientThread implements Runnable {
             System.out.println(name);
 
             myServer.addClient(this);
-            output.writeObject("login");
+            //output.writeObject("login");
 
             /*while(!ifDataCorrect) {
                  text = "Wpisz login";

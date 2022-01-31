@@ -164,7 +164,6 @@ public class Request {
                 sb = new StringBuilder();
                 sb.append("SELECT koszyk_id FROM klient WHERE login = '" + substrings[1] +"'");
                 query=sb.toString();
-
                 koszyk_id = 0;
                 try {
 
@@ -181,7 +180,8 @@ public class Request {
                 resp.append("GETITEMSFROMCART#");
                 for(int i=0;i<products.size();i++)
                     resp.append(products.get(i).getR()+ "#"+products.get(i).getL() + "#");
-
+                resp.deleteCharAt(resp.length()-1);
+                System.out.println(resp.toString());
                 response = resp.toString();
                 break;
             case "DELETEFROMCART":

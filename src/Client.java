@@ -30,6 +30,7 @@ class Client extends JFrame implements ActionListener, Runnable{
     final static String ORDERPANEL = "Order layout";
     final static String VIEWOFORDERS = "View of client orders layout";
     static Vector<Product> produkty = new Vector<>();
+    static Vector<Product> calabaza= new Vector<>();
     static Vector<String> categories = new Vector<>();
     static Vector<Pair<Product,Integer>> productsInCart = new Vector<>();
     private static boolean permission;
@@ -119,8 +120,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                     e.printStackTrace();
                 }
                 categoryList.setListData(categories);
-                categoryList.repaint();
-
+                calabaza=new Vector<>(produkty);
             }
         });
 
@@ -920,11 +920,10 @@ class Client extends JFrame implements ActionListener, Runnable{
                         productsInCart.clear();
 
                         if(substrings.length>1)
-                        for(int i =1;i<substrings.length;i++){
-                            for(Product p : produkty)
+                        for(int i =1;i<substrings.length;i+=2){
+                            for(Product p : calabaza)
                                 if(p.ID == Integer.parseInt(substrings[i])){
-                                    i++;
-                                    productsInCart.addElement(new Pair<Product,Integer>(p,Integer.parseInt(substrings[i])));}
+                                    productsInCart.addElement(new Pair<Product,Integer>(p,Integer.parseInt(substrings[i+1])));}
                         }
 
 
