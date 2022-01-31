@@ -521,7 +521,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                 int id = Integer.parseInt((String) itemsTable.getValueAt(itemsTable.getSelectedRow(),0));
                // System.out.println(id);
                 int count=0;
-                int odczytana_ilosc_produktu=5;
+                int dostepna_ilosc_produktu=Integer.parseInt((String) itemsTable.getValueAt(itemsTable.getSelectedRow(),4));
                 try{
                     count = Integer.parseInt(countField.getText());
                 }
@@ -529,7 +529,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                     JOptionPane.showMessageDialog(null, "ilość musi być liczbą");
                     count = -1;
                 }
-                if(count>=1 && count<=odczytana_ilosc_produktu){
+                if(count>=1 && count<=dostepna_ilosc_produktu){
                     sendMessage("ADDTOCART#"+login.getText()+"#"+id+"#"+count);
                 }else JOptionPane.showMessageDialog(null, "Podano nieprawidłową ilość towaru");
 
