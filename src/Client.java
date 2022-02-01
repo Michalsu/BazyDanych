@@ -442,7 +442,7 @@ class Client extends JFrame implements ActionListener, Runnable{
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sendMessage("SEARCH#"+DataSecurity.sanitizeInput(searchField.getText()).replace("#",""));
+                sendMessage("SEARCH#"+DataSecurity.sanitizeInput(searchField.getText()).replace(" ","#"));
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException interruptedException) {
