@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -119,6 +120,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                         sb.append(login.getText()+ "#");
                         sb.append(password.getText());
                         sendMessage(sb.toString());
+                        name=login.getText();
                     }else JOptionPane.showMessageDialog(null, combinedMessage.toString());
                 }else JOptionPane.showMessageDialog(null, "Musisz wprowadzić dane logowania");
 
@@ -337,6 +339,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                 pane.setSize(new Dimension(355, 300));
                 login.setText("");
                 password.setText("");
+                setTitle("Aplikacja klienta sklepu");
             }
         });
 
@@ -881,9 +884,10 @@ class Client extends JFrame implements ActionListener, Runnable{
         String type ;
 
 
+        Random random = new Random();
 
-            new Client("1", host);
-       // new Client("name", host);
+        new Client(String.valueOf(random.nextInt()), host);
+
 
 
 
@@ -903,7 +907,7 @@ class Client extends JFrame implements ActionListener, Runnable{
     private ObjectInputStream inputStream;
 
     Client(String name, String host) {
-        super(name);
+        super("Aplikacja klienta sklepu");
         this.name = name;
         this.serverHost = host;
         this.permission = false;
@@ -1025,6 +1029,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                         //Adam#Haslo!123
                         if(substrings[1].equals("SUCCESSFUL")){
                             setPermission(true);
+                            this.setTitle("Klient: "+this.name);
                             CardLayout cl = (CardLayout)(cards.getLayout());
                             cl.show(cards,CLIENTPANEL);
                             this.setSize(new Dimension(850,500));
@@ -1107,7 +1112,7 @@ class Client extends JFrame implements ActionListener, Runnable{
                 }
             }
         } catch(Exception e){
-            JOptionPane.showMessageDialog(null, "Polaczenie sieciowe dla klienta zostalo przerwane");
+            //JOptionPane.showMessageDialog(null, "Polaczenie sieciowe dla klienta zostalo przerwane");
             setVisible(false);
             dispose();
         }
