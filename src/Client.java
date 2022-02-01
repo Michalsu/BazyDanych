@@ -164,8 +164,10 @@ class Client extends JFrame implements ActionListener, Runnable{
         JTextField homeNumberField = new JTextField("Numer ulicy");
 
         JButton register = new JButton("Zarejestruj się");
+        JButton backRegister = new JButton("Wróć");
 
         registerLabel.setBounds(65,10 ,200,30);
+
 
         loginField.setBounds(65,50,200,30);
         passwordField.setBounds(65,85,200,30);
@@ -180,8 +182,8 @@ class Client extends JFrame implements ActionListener, Runnable{
         streetField.setBounds(65,330,200,30);
         homeNumberField.setBounds(65,365,200,30);
 
-        register.setBounds(65,400,200,30);
-
+        register.setBounds(65,400,120,30);
+        backRegister.setBounds(195,400,70,30);
 
         RegisterLayout.setLayout(null);
 
@@ -199,7 +201,17 @@ class Client extends JFrame implements ActionListener, Runnable{
         RegisterLayout.add(homeNumberField);
 
         RegisterLayout.add(register);
+        RegisterLayout.add(backRegister);
 
+
+        backRegister.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CardLayout cl = (CardLayout) (cards.getLayout());
+                cl.show(cards, LOGINPANEL);
+                pane.setSize(new Dimension(355, 300));
+            }
+        });
 
         register.addActionListener(new ActionListener() {
             @Override
@@ -887,11 +899,6 @@ class Client extends JFrame implements ActionListener, Runnable{
         Random random = new Random();
 
         new Client(String.valueOf(random.nextInt()), host);
-
-
-
-
-
     }
 
 
