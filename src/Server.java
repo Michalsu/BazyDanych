@@ -1,4 +1,4 @@
-import java.io.File;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.URISyntaxException;
@@ -6,9 +6,6 @@ import java.security.CodeSource;
 import java.sql.*;
 
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -223,7 +220,12 @@ class ClientThread implements Runnable {
 */
 
             while(true){
-                message = (String)input.readObject();
+                message="";
+                try{
+                    message = (String)input.readObject();
+                }catch (EOFException e){
+                }
+
                 String answ;
                 myServer.printReceivedMessage(this,message);
                 if (message.equals("LOGOUT")){
@@ -248,17 +250,24 @@ class ClientThread implements Runnable {
                     answ=Request.parseRequest(message , con);
                     if(answ.equals("LOGIN#SUCCESSFUL")){
                         this.login=login;
+                        this.name=login;
                     }
                     sendMessage(answ);
                 }
-                else
+                else if(message!="")
                 {
 
                      answ=Request.parseRequest(message , con);
                      sendMessage(answ);
                     System.out.println(answ);
                 }
-
+                else {
+                    myServer.removeClient(this);
+                    input.close();
+                    output.close();
+                    socket.close();
+                    socket=null;
+                }
             }
 
         }
