@@ -18,17 +18,13 @@ public class Server  extends JFrame implements  Runnable{
     private static final long serialVersionUID = 1L;
 
     static final int SERVER_PORT = 25000;
-    static Connection con=null;
+
 
     public static void main(String[] args) throws Exception {
 
         new Server();
-        con=DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/baza","root","root");
-
-
 
     }
-
 
     private JLabel clientLabel   = new JLabel("Odbiorca:");
     private JLabel textAreaLabel = new JLabel("Dialog:");
@@ -78,8 +74,8 @@ public class Server  extends JFrame implements  Runnable{
         clientMenu.removeItem(client);
     }
 
-    public void run() {
-        boolean socket_created = false;
+        public void run() {
+            boolean socket_created = false;
 
         // inicjalizacja polaczen sieciowych
         try (ServerSocket serwer = new ServerSocket(SERVER_PORT)) {
@@ -95,20 +91,20 @@ public class Server  extends JFrame implements  Runnable{
                     // wlasnie polaczyl sie z serwerem.
                     new ClientThread(this, socket);
 
+                    }
+                }
+            } catch (IOException e) {
+
+                if (!socket_created) {
+                    JOptionPane.showMessageDialog(null, "Gniazdko dla serwera nie może byc utworzone");
+                    System.exit(0);
+                } else {
+                    JOptionPane.showMessageDialog(null, "BLAD SERWERA: Nie mozna polaczyc sie z klientem ");
                 }
             }
-        } catch (IOException e) {
-            System.out.println(e);
-            if (!socket_created) {
-                JOptionPane.showMessageDialog(null, "Gniazdko dla serwera nie może byc utworzone");
-                System.exit(0);
-            } else {
-                JOptionPane.showMessageDialog(null, "BLAD SERWERA: Nie mozna polaczyc sie z klientem ");
-            }
+
+
         }
-
-
-    }
 
 
 
@@ -119,8 +115,7 @@ class ClientThread implements Runnable {
     private String name;
     private Server myServer;
     private String login;
-    private String password;
-    private String type;
+
 
     private ObjectOutputStream outputStream = null;
 
@@ -153,10 +148,6 @@ class ClientThread implements Runnable {
 
     public void run(){
         String message;
-        final String DATABASE_URL = "jdbc:mysql://127.0.0.1:3306/baza";
-        final String USERNAME = "root";
-        final String PASSWORD = "root";
-        final String MAX_POOL = "250";
 
         Connection con= null;
         try {
@@ -171,53 +162,10 @@ class ClientThread implements Runnable {
         try( ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream input = new ObjectInputStream(socket.getInputStream()); )
         {
-
-            boolean ifDataCorrect = false;
-            boolean ifLogin =false;
-            String text;
             outputStream = output;
             name = (String)input.readObject();
 
-            System.out.println(name);
-
             myServer.addClient(this);
-            //output.writeObject("login");
-
-            /*while(!ifDataCorrect) {
-                 text = "Wpisz login";
-                output.writeObject(text);
-                login = (String)input.readObject();
-
-                System.out.println(login);
-             text = "Wpisz hasło";
-            output.writeObject(text);
-            password = (String)input.readObject();
-            System.out.println(password);
-            switch(Request.login(con,login,password, "user"))
-            {
-                case 0:
-                    text = "Zalogowano";
-                    output.writeObject(text);
-                    ifDataCorrect=true;
-                    ifLogin=true;
-                    myServer.addClient(this);
-                    break;
-
-                case -1:
-                    text = "Nieprawidłowe hasło";
-                    output.writeObject(text);
-                    break;
-                case -2:
-                    text = "Nieprawidłowy login";
-                    output.writeObject(text);
-                    break;
-
-
-            }
-
-            }
-
-*/
 
             while(true){
                 message="";
@@ -259,7 +207,7 @@ class ClientThread implements Runnable {
 
                      answ=Request.parseRequest(message , con);
                      sendMessage(answ);
-                    System.out.println(answ);
+
                 }
                 else {
                     myServer.removeClient(this);
@@ -279,6 +227,8 @@ class ClientThread implements Runnable {
     }
 
 }
+
+//wątek do obsługi kopii zapaswoej danych oraz usuwania danych po roku od złożenia zamówienia
 class otherThreads {
     Timer timer;
 int i =0;

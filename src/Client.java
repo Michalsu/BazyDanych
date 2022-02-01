@@ -885,11 +885,7 @@ class Client extends JFrame implements ActionListener, Runnable{
 
     }
 
-    private void createAndShowGUI() {
-        //Create and set up the window.
 
-
-    }
     public static void main(String[] args) {
         String name = "klient";
         String host = "";
