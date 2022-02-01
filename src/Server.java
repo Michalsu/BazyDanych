@@ -81,18 +81,18 @@ public class Server  extends JFrame implements  Runnable{
     public void run() {
         boolean socket_created = false;
 
-        // inicjalizacja po��cze� sieciowych
+        // inicjalizacja polaczen sieciowych
         try (ServerSocket serwer = new ServerSocket(SERVER_PORT)) {
             String host = InetAddress.getLocalHost().getHostName();
-            System.out.println("Serwer zosta� uruchomiony na hoscie " + host);
+            System.out.println("Serwer został uruchomiony na hoscie " + host);
             socket_created = true;
-            // koniec inicjalizacji po��cze� sieciowych
+            // koniec inicjalizacji poloczen sieciowych
 
-            while (true) {  // oczekiwanie na po��czenia przychdz�ce od klient�w
+            while (true) {  // oczekiwanie na poloczenia przychdzace od klientow
                 Socket socket = serwer.accept();
                 if (socket != null) {
-                    // Tworzy nowy w�tek do obs�ugi klienta, kt�re
-                    // w�a�nie po��czy� si� z serwerem.
+                    // Tworzy nowy watek do obslugi klienta, ktore
+                    // wlasnie polaczyl sie z serwerem.
                     new ClientThread(this, socket);
 
                 }
@@ -124,8 +124,8 @@ class ClientThread implements Runnable {
 
     private ObjectOutputStream outputStream = null;
 
-    // UWAGA: Ten konstruktor tworzy nieaktywny obiekt ClientThread,
-    // kt�ry posiada tylko nazw� prototypow�, potrzebn� dla
+    // Ten konstruktor tworzy nieaktywny obiekt ClientThread,
+    // ktory posiada tylko nazwe prototypowa, potrzebna dla
     // metody setPrototypeDisplayValue z klasy JComboBox
     ClientThread(String prototypeDisplayValue){
         name = prototypeDisplayValue;
